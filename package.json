@@ -1,0 +1,101 @@
+{
+    "name": "vscode-rhai",
+    "private": true,
+    "displayName": "Rhai Language Support",
+    "description": "Highlight and formatter for Rhai",
+    "publisher": "aster",
+    "version": "0.1.0",
+    "icon": "assets/icon.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GalAster/vscode-rhai.git"
+    },
+    "categories": [
+        "Programming Languages",
+        "Formatters"
+    ],
+    "scripts": {
+        "build:syntax": "ts-node syntax/build.ts",
+        "build:ts": "tsc -b",
+        "build": "wee build:syntax -t && wee build:ts -t",
+        "pack": "wee build && vsce package",
+        "lint": "tslint **/*.ts --fix"
+    },
+    "main": "./dist/extension.js",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "activationEvents": [
+        "onLanguage:rhai"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "rhai",
+                "aliases": [
+                    "RHAI"
+                ],
+                "extensions": [
+                    ".rhai"
+                ],
+                "filenames": [],
+                "filenamePatterns": [],
+                "mimetypes": [],
+                "configuration": "./syntax/rhai.configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "rhai",
+                "scopeName": "source.rhai",
+                "path": "./syntax/rhai.tmLanguage.json"
+            },
+            {
+                "scopeName": "markdown.rhai.codeblock",
+                "path": "./syntax/rhai.markdown.json",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.rhai": "rhai"
+                }
+            }
+        ],
+        "commands": [
+            {
+                "command": "rhai.format",
+                "title": "Rhai: Format File"
+            }
+        ],
+        "configuration": {
+            "title": "Rhai",
+            "properties": {
+                "rhai.useLanguageServer": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Use Rhai Language Server"
+                },
+                "rhai.trace.server": {
+                    "type": "string",
+                    "default": "off",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "description": "Traces the communication between VS Code and the language server.",
+                    "scope": "window"
+                }
+            }
+        }
+    },
+    "dependencies": {
+        "vscode-languageclient": "^6.1.3"
+    },
+    "devDependencies": {
+        "@types/node": "^11.13.6",
+        "@types/vscode": "^1.30.0",
+        "tslint": "^6.0.0",
+        "typescript": "^3.8.2"
+    }
+}

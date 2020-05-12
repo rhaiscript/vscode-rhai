@@ -1,0 +1,10 @@
+node_modules
+source/**/*
+images/**/*
+test/**/*
+
+
+*.tgz
+**/*.ai
+yarn*
+

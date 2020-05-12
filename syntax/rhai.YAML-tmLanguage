@@ -1,0 +1,369 @@
+version: v0.2.0
+scopeName: source.awsl
+uuid: 3be16738-a75d-43d7-aee8-e4bcfb243c07
+information_for_contributors:
+  - 'aster: galaster@foxmail.com'
+keyEquivalent: ^~H
+foldingStartMarker: |-
+  (?x)
+  (<(?i:head|body|table|thead|tbody|tfoot|tr|div|select|fieldset|style|script|ul|ol|li|form|dl)\b.*?>
+  |<!--(?!.*--\s*>)
+  |^<!--\ \#tminclude\ (?>.*?-->)$
+  |<\?(?:php)?.*\b(if|for(each)?|while)\b.+:
+  |\{\{?(if|foreach|capture|literal|foreach|php|section|strip)
+  |\{\s*($|\?>\s*$|//|/\*(.*\*/\s*$|(?!.*?\*/)))
+  )
+foldingStopMarker: |-
+  (?x)
+  (</(?i:head|body|table|thead|tbody|tfoot|tr|div|select|fieldset|style|script|ul|ol|li|form|dl)>
+  |^(?!.*?<!--).*?--\s*>
+  |^<!--\ end\ tminclude\ -->$
+  |<\?(?:php)?.*\bend(if|for(each)?|while)\b
+  |\{\{?/(if|foreach|capture|literal|foreach|php|section|strip)
+  |^[^{]*\}
+  )
+patterns:
+  - include: '#comment'
+  - include: '#html'
+  - include: '#statements'
+  - include: '#literals'
+repository:
+  comment:
+    patterns:
+      - name: comment.block.awsl
+        begin: (%%%)
+        beginCaptures:
+          '1': {name: punctuation.definition.comment.block.awsl}
+        end: (%%%)
+        endCaptures:
+          '1': {name: punctuation.definition.comment.block.awsl}
+        patterns:
+          - include: text.html.markdown
+      - name: comment.line.awsl
+        match: (%).*$\n?
+        captures:
+          '1': {name: punctuation.definition.comment.line.awsl}
+      - name: comment.block.html
+        begin: <!--
+        end: --\s*>
+      - name: comment.block.html
+        begin: <?
+        end: ?>
+      - name: comment.doctype.html
+        match: (<)(!DOCTYPE)(.*)(>)
+  keywords:
+    patterns:
+      - match: \b(using|macro|as|with|type|external|extending|where)\b
+        name: keyword.control.definition.awsl
+      - match: \b(switch|match|case)\b
+        name: keyword.control.flow.awsl
+      - match: \b(do|while|loop|return|yield|break|pass)\b
+        name: keyword.control.loop.awsl
+      - match: \b(this|super)\b
+        name: keyword.control.context.awsl
+      - begin: \b(for)\b
+        beginCaptures:
+          '1': {name: keyword.control.loop.awsl}
+        end: \b(in)\b
+        endCaptures:
+          '1': {name: keyword.control.loop.awsl}
+        patterns:
+          - include: '#literals'
+      - match: \b(is|not|or|and|in)\b
+        name: keyword.operator.comparison.awsl
+      - match: \b(true|false)\b
+        name: keyword.control.awsl
+      - match: \b(null)\b
+        name: constant.language.null.awsl
+  statements:
+    patterns:
+      - include: '#let'
+      - include: '#def'
+      - include: '#block'
+      - include: '#if'
+  let:
+    begin: \b(let)\b
+    beginCaptures:
+      '1': {name: storage.type.let.awsl}
+    end: ([_0-9a-zA-Z]+)\s*[;=]|[{]
+    endCaptures:
+      '1': {name: entity.name.function.awsl} # variable.other.readwrite.awsl
+    patterns:
+      - match: ([_0-9a-zA-Z]+)
+        name: storage.modifier.awsl
+  def:
+    begin: \b(def)\b
+    beginCaptures:
+      '1': {name: storage.type.let.awsl}
+    end: ([_0-9a-zA-Z]+)\s*[(]
+    endCaptures:
+      '1': {name: entity.name.function.awsl} # variable.other.readwrite.awsl
+    patterns:
+      - match: ([_0-9a-zA-Z]+)
+        name: storage.modifier.awsl
+  if:
+    begin: \b(if|ef|else(?:\s*if)?)\b([^{]*)(\{)
+    beginCaptures:
+      '1': {name: storage.type.block.awsl}
+      '2':
+        patterns:
+          - include: '#literals'
+      '3': {name: punctuation.definition.block.begin.awsl}
+    end: (\})
+    endCaptures:
+      '1': {name: punctuation.definition.block.end.awsl}
+    patterns:
+      - include: '#comment'
+      - include: '#html'
+      - include: '#statements'
+      - include: '#literals'
+  block:
+    begin: \b(block|extends)\b\s*([_0-9a-zA-Z]+)\s*(\{)
+    beginCaptures:
+      '1': {name: storage.type.extends.awsl}
+      '2': {name: entity.name.type.extends.awsl}
+      '3': {name: punctuation.section.embedded.begin.awsl}
+    end: (\})
+    endCaptures:
+      '1': {name: punctuation.section.embedded.end.awsl}
+    patterns:
+      - include: '#html'
+      - include: '#html-escape'
+      - include: '#html-embbed'
+  operators:
+    patterns:
+      - match: \b(===?|=!=|<=|>=|<>)\b
+        name: keyword.operator.comparison.awsl
+      - match: \b(-|\+|\*|\/|\^)\b
+        name: keyword.operator.arithmetic.awsl
+      - match: \b(\?=|:=|=)\b
+        name: keyword.operator.assignment.awsl
+      - match: \b(∈|<:|:>|<-|->|:?)\b
+        name: keyword.operator.set.awsl
+      - match: \b(<|>)\b
+        name: keyword.operator.comparison.awsl
+      - match: \b(!|¬)\b
+        name: keyword.operator.infix.awsl
+      - match: \b(\?|°)\b
+        name: keyword.operator.logical.awsl
+  number:
+    patterns:
+      - match: (?<!\w)(0x[0-9a-fA-F]+)(_[A-Za-z][A-Za-z0-9_]*)?(?!\w)
+        captures:
+          '1': {name: constant.numeric.hex.awsl}
+          '2': {name: keyword.control.handler.byte.awsl}
+      - match: (?<!\w)(0o[0-7]+)(_[A-Za-z][A-Za-z0-9_]*)?(?!\w)
+        captures:
+          '1': {name: constant.numeric.oct.awsl}
+          '2': {name: keyword.control.handler.byte.awsl}
+      - match: (?<!\w)(0b[01]+)(_[A-Za-z][A-Za-z0-9_]*)?(?!\w)
+        captures:
+          '1': {name: constant.numeric.bin.awsl}
+          '2': {name: keyword.control.handler.byte.awsl}
+      - match: ([\+\-]?(0|([1-9](([0-9]|_[0-9])+)?))(?:(?:\.(0|([1-9](([0-9]|_[0-9])+)?)))?\*\*[\+\-]?[1-9]_?[0-9]*|(?:\.[0-9_]*)))
+        captures:
+          '1': {name: constant.numeric.decimal.awsl}
+      - match: ([\+\-]?(0|[1-9][0-9]*))
+        captures:
+          '1': {name: constant.numeric.integer.awsl}
+      - match: (¯|¨)
+        captures:
+          '1': {name: constant.numeric.control.awsl}
+  string:
+    patterns:
+      - name: string.quoted.block.awsl
+        begin: ([A-Za-z_][A-Za-z0-9_]*)?\s*(''')
+        beginCaptures:
+          '1': {name: keyword.control.handler.string.awsl}
+          '2': {name: punctuation.definition.string.block.awsl}
+        end: (''')
+        endCaptures:
+          '1': {name: punctuation.definition.string.block.awsl}
+      - name: string.quoted.block.awsl
+        begin: ([A-Za-z_][A-Za-z0-9_]*)?\s*(""")
+        beginCaptures:
+          '1': {name: keyword.control.handler.string.awsl}
+          '2': {name: punctuation.definition.string.block.awsl}
+        end: (""")
+        endCaptures:
+          '1': {name: punctuation.definition.string.block.awsl}
+        patterns:
+          - match: \\([btnfr"\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})
+            name: constant.character.escape.awsl
+          - match: \\[^btnfr/"\\\n]
+            name: invalid.illegal.escape.awsl
+      - match: ([A-Za-z_][A-Za-z0-9_]*)?\s*(\'[^'\\]*(?:\\.[^'\\]*)*\')
+        captures:
+          '1': {name: keyword.control.handler.string.awsl}
+          '2': {name: string.quoted.single.awsl}
+      - match: ([A-Za-z_][A-Za-z0-9_]*)?\s*("[^"\\]*(?:\\.[^"\\]*)*")
+        captures:
+          '1': {name: keyword.control.handler.string.awsl}
+          '2': {name: string.quoted.single.awsl}
+        patterns:
+          - match: \\([btnfr"\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})
+            name: constant.character.escape.awsl
+          - match: \\[^btnfr/"\\\n]
+            name: invalid.illegal.escape.awsl
+      - match: (&[a-zA-Z]+;)|(&#[0-9]+;)
+        name: constant.character.escape.awsl
+  symbol:
+    patterns:
+      - match: \b([_a-zA-Z][_0-9a-zA-Z]*)\b
+        name: meta.function-call.generic.python
+      - match: \b(::)\b
+        name: entity.name.function.namespace.awsl
+  call:
+    patterns:
+      - begin: ([A-Za-z_][A-Za-z0-9_]*)\s*(\()
+        beginCaptures:
+          '1': {name: entity.name.tag.structure.any.awsl}
+          '2': {name: punctuation.definition.tag.begin.awsl}
+        end: (\))
+        endCaptures:
+          '1': {name: punctuation.definition.tag.end.awsl}
+        patterns:
+          - include: '#literals'
+  key:
+    patterns:
+      - match: \b([a-zA-Z][_0-9a-zA-Z]*)\b\s*(=)
+        captures:
+          '1': {name: constant.language.key.awsl}
+          '2': {name: keyword.operator.assignment.awsl}
+  literals:
+    patterns:
+      - include: '#string'
+      - include: '#number'
+      - include: '#key'
+      - include: '#keywords'
+      - include: '#call'
+      - include: '#number'
+      - include: '#symbol'
+  ##################################################################
+  html:
+    patterns:
+      - match: (</>)
+        name: entity.name.tag.fragment.slot.html
+      - begin: (<>)
+        beginCaptures:
+          '1': {name: entity.name.tag.fragment.begin.html}
+        end: (</>)
+        endCaptures:
+          '1': {name: entity.name.tag.fragment.end.html}
+        patterns:
+          - include: '#html'
+          - include: '#html-escape'
+          - include: '#html-embbed'
+      - include: '#html-special'
+      - match: (<)([a-zA-Z][a-zA-Z0-9]*)([^/>]*)(/>)
+        captures:
+          '1': {name: punctuation.definition.tag.end.awsl}
+          '2': {name: entity.name.tag.html.awsl}
+          '3':
+            patterns:
+              - include: '#literals'
+          '4': {name: punctuation.definition.tag.end.awsl}
+      - begin: (<)([a-zA-Z][a-zA-Z0-9]*)([^>]*)(>)
+        beginCaptures:
+          '1': {name: punctuation.definition.tag.end.awsl}
+          '2': {name: entity.name.tag.html.awsl}
+          '3':
+            patterns:
+              - include: '#literals'
+          '4': {name: punctuation.definition.tag.end.awsl}
+        end: (</)([a-zA-Z][a-zA-Z0-9]*)\s*(>)
+        endCaptures:
+          '1': {name: punctuation.definition.tag.end.awsl}
+          '2': {name: entity.name.tag.html.awsl}
+          '3': {name: punctuation.definition.tag.end.awsl}
+        patterns:
+          - include: '#html'
+          - include: '#html-escape'
+          - include: '#html-embbed'
+  html-embbed:
+    contentName: meta.embedded.expression.awsl
+    begin: \{
+    beginCaptures:
+      '0': { name: punctuation.definition.block.begin.awsl }
+    end: \}
+    endCaptures:
+      '0': { name: punctuation.definition.block.end.awsl }
+    patterns:
+      - include: '#statements'
+      - include: '#literals'
+  html-escape:
+    name: constant.character.escape.awsl
+    match: (&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)
+    captures:
+      '1': {name: punctuation.definition.entity.awsl}
+      '3': {name: punctuation.definition.entity.awsl}
+  html-special:
+    patterns:
+      - include: '#style-css'
+      - include: '#script-js'
+  html-inline:
+    patterns:
+      - name: meta.tag.inline.any.html
+        begin: (<)((?i:a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var)\b)
+        beginCaptures:
+          '1': {name: punctuation.definition.tag.begin.html}
+          '2': {name: entity.name.tag.inline.any.html}
+        end: (?=[/]?>)
+        endCaptures:
+          '1': {name: punctuation.definition.tag.end.html}
+        patterns:
+          - include: '#literals'
+      - name: meta.tag.other.html
+        begin: (<)([a-zA-Z0-9:-]+)
+        beginCaptures:
+          '1': {name: punctuation.definition.tag.begin.html}
+          '2': {name: entity.name.tag.other.html}
+        end: (/>)
+        endCaptures:
+          '1': {name: punctuation.definition.tag.end.html}
+        patterns:
+          - include: '#literals'
+  style-css:
+    begin: (<)(style)\b(?=[^>]*type="text/(css|scss)")(?![^/>]*/>\s*$)
+    beginCaptures:
+      '1': {name: punctuation.definition.tag.begin.html}
+      '2': {name: entity.name.tag.style.html}
+    end: (</)(style)(>)
+    endCaptures:
+      '1': {name: punctuation.definition.tag.begin.html}
+      '2': {name: entity.name.tag.style.html}
+      '3': {name: punctuation.definition.tag.end.html}
+    patterns:
+      - include: "#literals"
+      - contentName: source.css.scss
+        begin: (>)
+        beginCaptures:
+          '1':
+            name: punctuation.definition.tag.end.html
+        end: (?=</style>)
+        patterns:
+          - include: source.css.scss
+  script-js:
+    begin: (<)(script)\b(?=[^>]*type="(text|application)/javascript")(?![^/>]*/>\s*$)
+    beginCaptures:
+      '1': {name: punctuation.definition.tag.begin.html}
+      '2': {name: entity.name.tag.style.html}
+    end: (</)(script)(>)
+    endCaptures:
+      '1': {name: punctuation.definition.tag.begin.html}
+      '2': {name: entity.name.tag.style.html}
+      '3': {name: punctuation.definition.tag.end.html}
+    patterns:
+      - include: "#literals"
+      - contentName: source.js
+        begin: (>)
+        beginCaptures:
+          '1':
+            name: punctuation.definition.tag.end.html
+        end: (?=</script>)
+        patterns:
+          - include: source.js
+  string-css:
+    name: unimplemented
+  string-js:
+    name: unimplemented
