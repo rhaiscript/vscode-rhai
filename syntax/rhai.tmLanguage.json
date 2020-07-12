@@ -1,13 +1,27 @@
 {
-    "version": "v0.1.0",
+    "version": "v0.4.0",
     "scopeName": "source.rhai",
     "information_for_contributors": [
         "aster: galaster@foxmail.com"
     ],
-    "keyEquivalent": "^~H",
     "patterns": [
         {
             "include": "#comment"
+        },
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#string"
+        },
+        {
+            "include": "#number"
+        },
+        {
+            "include": "#symbol"
+        },
+        {
+            "include": "#operators"
         }
     ],
     "repository": {
@@ -41,83 +55,44 @@
                             "name": "punctuation.definition.comment.line.rhai"
                         }
                     }
-                },
-                {
-                    "name": "comment.block.html",
-                    "begin": "<!--",
-                    "end": "--\\s*>"
-                },
-                {
-                    "name": "comment.block.html",
-                    "begin": "<?",
-                    "end": "?>"
                 }
             ]
         },
         "keywords": {
             "patterns": [
                 {
-                    "match": "\\b(using|macro|as|with|type|external|extending|where)\\b",
+                    "match": "\\b(using|macro|def|as|in|with|type|external|extending|where)\\b",
                     "name": "keyword.control.definition.rhai"
                 },
                 {
-                    "match": "\\b(switch|match|case)\\b",
+                    "match": "\\b(if|iff|switch|match|case)\\b",
                     "name": "keyword.control.flow.rhai"
                 },
                 {
-                    "match": "\\b(do|while|loop|return|yield|break|pass)\\b",
+                    "match": "\\b(do|while|loop|return|for|yield|break|pass)\\b",
                     "name": "keyword.control.loop.rhai"
-                },
-                {
-                    "match": "\\b(this|super)\\b",
-                    "name": "keyword.control.context.rhai"
-                },
-                {
-                    "begin": "\\b(for)\\b",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "keyword.control.loop.rhai"
-                        }
-                    },
-                    "end": "\\b(in)\\b",
-                    "endCaptures": {
-                        "1": {
-                            "name": "keyword.control.loop.rhai"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#literals"
-                        }
-                    ]
-                },
-                {
-                    "match": "\\b(is|not|or|and|in)\\b",
-                    "name": "keyword.operator.comparison.rhai"
                 },
                 {
                     "match": "\\b(true|false)\\b",
                     "name": "keyword.control.rhai"
                 },
                 {
-                    "match": "\\b(null)\\b",
-                    "name": "constant.language.null.rhai"
-                }
-            ]
-        },
-        "statements": {
-            "patterns": [
+                    "match": "¶[¶0-9]*",
+                    "name": "variable.parameter.input.ts"
+                },
+                {
+                    "match": "⁋[⁋0-9]*",
+                    "name": "variable.parameter.output.ts"
+                },
+                {
+                    "match": "(##|#[0-9a-zA-Z]*|&)",
+                    "name": "variable.parameter.lambda.ts"
+                },
                 {
                     "include": "#let"
                 },
                 {
-                    "include": "#def"
-                },
-                {
-                    "include": "#block"
-                },
-                {
-                    "include": "#if"
+                    "include": "#trait"
                 }
             ]
         },
@@ -141,17 +116,17 @@
                 }
             ]
         },
-        "def": {
-            "begin": "\\b(def)\\b",
+        "trait": {
+            "begin": "\\b(trait)\\b",
             "beginCaptures": {
                 "1": {
-                    "name": "storage.type.let.rhai"
+                    "name": "storage.type.trait.rhai"
                 }
             },
-            "end": "([_0-9a-zA-Z]+)\\s*[(]",
+            "end": "([_0-9a-zA-Z]+)\\s*[{;]",
             "endCaptures": {
                 "1": {
-                    "name": "entity.name.function.rhai"
+                    "name": "entity.name.type.trait.rhai"
                 }
             },
             "patterns": [
@@ -161,123 +136,39 @@
                 }
             ]
         },
-        "if": {
-            "begin": "\\b(if|ef|else(?:\\s*if)?)\\b([^{]*)(\\{)",
-            "beginCaptures": {
-                "1": {
-                    "name": "storage.type.block.rhai"
-                },
-                "2": {
-                    "patterns": [
-                        {
-                            "include": "#literals"
-                        }
-                    ]
-                },
-                "3": {
-                    "name": "punctuation.definition.block.begin.rhai"
-                }
-            },
-            "end": "(\\})",
-            "endCaptures": {
-                "1": {
-                    "name": "punctuation.definition.block.end.rhai"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#comment"
-                },
-                {
-                    "include": "#html"
-                },
-                {
-                    "include": "#statements"
-                },
-                {
-                    "include": "#literals"
-                }
-            ]
-        },
-        "block": {
-            "begin": "\\b(block|extends)\\b\\s*([_0-9a-zA-Z]+)\\s*(\\{)",
-            "beginCaptures": {
-                "1": {
-                    "name": "storage.type.extends.rhai"
-                },
-                "2": {
-                    "name": "entity.name.type.extends.rhai"
-                },
-                "3": {
-                    "name": "punctuation.section.embedded.begin.rhai"
-                }
-            },
-            "end": "(\\})",
-            "endCaptures": {
-                "1": {
-                    "name": "punctuation.section.embedded.end.rhai"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#comment"
-                }
-            ]
-        },
         "operators": {
             "patterns": [
                 {
-                    "match": "\\b(===?|=!=|<=|>=|<>)\\b",
+                    "match": "(===?|=!=|<=|>=|<>)",
                     "name": "keyword.operator.comparison.rhai"
                 },
                 {
-                    "match": "\\b(-|\\+|\\*|\\/|\\^)\\b",
+                    "match": "(\\|>|/@|@@@|@@|@)",
+                    "name": "keyword.operator.apply.rhai"
+                },
+                {
+                    "match": "(-|\\+|\\*|\\/|\\^)",
                     "name": "keyword.operator.arithmetic.rhai"
                 },
                 {
-                    "match": "\\b(\\?=|:=|=)\\b",
+                    "match": "(\\?=|:=|=)",
                     "name": "keyword.operator.assignment.rhai"
                 },
                 {
-                    "match": "\\b(∈|<:|:>|<-|->|:?)\\b",
+                    "match": "(∈|<:|:>|<-|->|:?)",
                     "name": "keyword.operator.set.rhai"
                 },
                 {
-                    "match": "\\b(<|>)\\b",
+                    "match": "(<|>)",
                     "name": "keyword.operator.comparison.rhai"
                 },
                 {
-                    "match": "\\b(!|¬)\\b",
+                    "match": "(!|¬)",
                     "name": "keyword.operator.infix.rhai"
                 },
                 {
-                    "match": "\\b(\\?|°)\\b",
+                    "match": "(\\?|°)",
                     "name": "keyword.operator.logical.rhai"
-                }
-            ]
-        },
-        "literals": {
-            "patterns": [
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#number"
-                },
-                {
-                    "include": "#key"
-                },
-                {
-                    "include": "#keywords"
-                },
-                {
-                    "include": "#call"
-                },
-                {
-                    "include": "#number"
-                },
-                {
-                    "include": "#symbol"
                 }
             ]
         },
@@ -421,63 +312,26 @@
                             "name": "invalid.illegal.escape.rhai"
                         }
                     ]
-                },
-                {
-                    "match": "(&[a-zA-Z]+;)|(&#[0-9]+;)",
-                    "name": "constant.character.escape.rhai"
                 }
             ]
         },
         "symbol": {
             "patterns": [
                 {
-                    "match": "\\b([_a-zA-Z][_0-9a-zA-Z]*)\\b",
-                    "name": "meta.function-call.generic.python"
+                    "match": "(^@[a-zA-Z][_0-9a-zA-Z]*)",
+                    "name": "variable.parameter.macro.ts"
                 },
                 {
-                    "match": "\\b(::)\\b",
+                    "match": "(\\$[a-zA-Z][_0-9a-zA-Z]*)",
+                    "name": "variable.parameter.macro.ts"
+                },
+                {
+                    "match": "([_a-zA-Z][_0-9a-zA-Z]*)",
+                    "name": "entity.name.function.rhai"
+                },
+                {
+                    "match": "(::)",
                     "name": "entity.name.function.namespace.rhai"
-                }
-            ]
-        },
-        "call": {
-            "patterns": [
-                {
-                    "begin": "([A-Za-z_][A-Za-z0-9_]*)\\s*(\\()",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "entity.name.tag.structure.any.rhai"
-                        },
-                        "2": {
-                            "name": "punctuation.definition.tag.begin.rhai"
-                        }
-                    },
-                    "end": "(\\))",
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.tag.end.rhai"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#literals"
-                        }
-                    ]
-                }
-            ]
-        },
-        "key": {
-            "patterns": [
-                {
-                    "match": "\\b([a-zA-Z][_0-9a-zA-Z]*)\\b\\s*(=)",
-                    "captures": {
-                        "1": {
-                            "name": "constant.language.key.rhai"
-                        },
-                        "2": {
-                            "name": "keyword.operator.assignment.rhai"
-                        }
-                    }
                 }
             ]
         }
