@@ -29,13 +29,13 @@
             "patterns": [
                 {
                     "name": "comment.block.rhai",
-                    "begin": "(%%%)",
+                    "begin": "(/\\*)",
                     "beginCaptures": {
                         "1": {
                             "name": "punctuation.definition.comment.block.rhai"
                         }
                     },
-                    "end": "(%%%)",
+                    "end": "(\\*/)",
                     "endCaptures": {
                         "1": {
                             "name": "punctuation.definition.comment.block.rhai"
@@ -43,13 +43,13 @@
                     },
                     "patterns": [
                         {
-                            "include": "text.html.markdown"
+                            "include": "#comment"
                         }
                     ]
                 },
                 {
                     "name": "comment.line.rhai",
-                    "match": "(%).*$\\n?",
+                    "match": "(//).*$\\n?",
                     "captures": {
                         "1": {
                             "name": "punctuation.definition.comment.line.rhai"
@@ -61,11 +61,11 @@
         "keywords": {
             "patterns": [
                 {
-                    "match": "\\b(using|macro|def|as|in|with|type|external|extending|where)\\b",
+                    "match": "\\b(using|macro|let|def|as|in|with|type|external|extending|where)\\b",
                     "name": "keyword.control.definition.rhai"
                 },
                 {
-                    "match": "\\b(if|iff|switch|match|case)\\b",
+                    "match": "\\b(if|else|switch|match|case)\\b",
                     "name": "keyword.control.flow.rhai"
                 },
                 {
@@ -77,42 +77,7 @@
                     "name": "keyword.control.rhai"
                 },
                 {
-                    "match": "¶[¶0-9]*",
-                    "name": "variable.parameter.input.ts"
-                },
-                {
-                    "match": "⁋[⁋0-9]*",
-                    "name": "variable.parameter.output.ts"
-                },
-                {
-                    "match": "(##|#[0-9a-zA-Z]*|&)",
-                    "name": "variable.parameter.lambda.ts"
-                },
-                {
-                    "include": "#let"
-                },
-                {
                     "include": "#trait"
-                }
-            ]
-        },
-        "let": {
-            "begin": "\\b(let)\\b",
-            "beginCaptures": {
-                "1": {
-                    "name": "storage.type.let.rhai"
-                }
-            },
-            "end": "([_0-9a-zA-Z]+)\\s*[;=]|[{]",
-            "endCaptures": {
-                "1": {
-                    "name": "entity.name.function.rhai"
-                }
-            },
-            "patterns": [
-                {
-                    "match": "([_0-9a-zA-Z]+)",
-                    "name": "storage.modifier.rhai"
                 }
             ]
         },
