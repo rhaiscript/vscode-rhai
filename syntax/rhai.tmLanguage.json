@@ -1,6 +1,7 @@
 {
     "version": "v0.4.0",
     "scopeName": "source.rhai",
+    "uuid": "1e76f176-ee1c-4331-a781-eb21c0da77cf",
     "information_for_contributors": [
         "aster: galaster@foxmail.com"
     ],
@@ -19,9 +20,6 @@
         },
         {
             "include": "#symbol"
-        },
-        {
-            "include": "#operators"
         }
     ],
     "repository": {
@@ -61,7 +59,11 @@
         "keywords": {
             "patterns": [
                 {
-                    "match": "\\b(using|macro|let|def|as|in|with|type|external|extending|where)\\b",
+                    "match": "\\b(let|const|fn)\\b",
+                    "name": "keyword.control.definition.rhai"
+                },
+                {
+                    "match": "\\b(using|macro|def|as|in|with|type|external|extending|where)\\b",
                     "name": "keyword.control.definition.rhai"
                 },
                 {
@@ -75,36 +77,13 @@
                 {
                     "match": "\\b(true|false)\\b",
                     "name": "keyword.control.rhai"
-                },
-                {
-                    "include": "#trait"
-                }
-            ]
-        },
-        "trait": {
-            "begin": "\\b(trait)\\b",
-            "beginCaptures": {
-                "1": {
-                    "name": "storage.type.trait.rhai"
-                }
-            },
-            "end": "([_0-9a-zA-Z]+)\\s*[{;]",
-            "endCaptures": {
-                "1": {
-                    "name": "entity.name.type.trait.rhai"
-                }
-            },
-            "patterns": [
-                {
-                    "match": "([_0-9a-zA-Z]+)",
-                    "name": "storage.modifier.rhai"
                 }
             ]
         },
         "operators": {
             "patterns": [
                 {
-                    "match": "(===?|=!=|<=|>=|<>)",
+                    "match": "(===?|=!=|<=|>=|<>|!=)",
                     "name": "keyword.operator.comparison.rhai"
                 },
                 {
@@ -173,7 +152,7 @@
                     }
                 },
                 {
-                    "match": "([\\+\\-]?(0|([1-9](([0-9]|_[0-9])+)?))(?:(?:\\.(0|([1-9](([0-9]|_[0-9])+)?)))?\\*\\*[\\+\\-]?[1-9]_?[0-9]*|(?:\\.[0-9_]*)))",
+                    "match": "([0-9]+(\\.[0-9][0-9]?))",
                     "captures": {
                         "1": {
                             "name": "constant.numeric.decimal.rhai"
@@ -187,14 +166,6 @@
                             "name": "constant.numeric.integer.rhai"
                         }
                     }
-                },
-                {
-                    "match": "(¯|¨)",
-                    "captures": {
-                        "1": {
-                            "name": "constant.numeric.control.rhai"
-                        }
-                    }
                 }
             ]
         },
@@ -202,12 +173,9 @@
             "patterns": [
                 {
                     "name": "string.quoted.block.rhai",
-                    "begin": "([A-Za-z_][A-Za-z0-9_]*)?\\s*(''')",
+                    "begin": "(''')",
                     "beginCaptures": {
                         "1": {
-                            "name": "keyword.control.handler.string.rhai"
-                        },
-                        "2": {
                             "name": "punctuation.definition.string.block.rhai"
                         }
                     },
@@ -220,12 +188,9 @@
                 },
                 {
                     "name": "string.quoted.block.rhai",
-                    "begin": "([A-Za-z_][A-Za-z0-9_]*)?\\s*(\"\"\")",
+                    "begin": "(\"\"\")",
                     "beginCaptures": {
                         "1": {
-                            "name": "keyword.control.handler.string.rhai"
-                        },
-                        "2": {
                             "name": "punctuation.definition.string.block.rhai"
                         }
                     },
@@ -247,23 +212,17 @@
                     ]
                 },
                 {
-                    "match": "([A-Za-z_][A-Za-z0-9_]*)?\\s*(\\'[^'\\\\]*(?:\\\\.[^'\\\\]*)*\\')",
+                    "match": "(\\'[^'\\\\]*(?:\\\\.[^'\\\\]*)*\\')",
                     "captures": {
                         "1": {
-                            "name": "keyword.control.handler.string.rhai"
-                        },
-                        "2": {
                             "name": "string.quoted.single.rhai"
                         }
                     }
                 },
                 {
-                    "match": "([A-Za-z_][A-Za-z0-9_]*)?\\s*(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")",
+                    "match": "(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")",
                     "captures": {
                         "1": {
-                            "name": "keyword.control.handler.string.rhai"
-                        },
-                        "2": {
                             "name": "string.quoted.single.rhai"
                         }
                     },
@@ -283,15 +242,7 @@
         "symbol": {
             "patterns": [
                 {
-                    "match": "(^@[a-zA-Z][_0-9a-zA-Z]*)",
-                    "name": "variable.parameter.macro.ts"
-                },
-                {
-                    "match": "(\\$[a-zA-Z][_0-9a-zA-Z]*)",
-                    "name": "variable.parameter.macro.ts"
-                },
-                {
-                    "match": "([_a-zA-Z][_0-9a-zA-Z]*)",
+                    "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\\w)",
                     "name": "entity.name.function.rhai"
                 },
                 {

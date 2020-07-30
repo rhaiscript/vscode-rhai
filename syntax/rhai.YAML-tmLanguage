@@ -1,6 +1,6 @@
 version: v0.4.0
 scopeName: source.rhai
-# uuid: 77108132-b3a9-4456-b8e6-05fca177371b
+uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
 information_for_contributors:
   - 'aster: galaster@foxmail.com'
 patterns:
@@ -9,7 +9,7 @@ patterns:
   - include: '#string'
   - include: '#number'
   - include: '#symbol'
-  - include: '#operators'
+#  - include: '#operators'
 repository:
   comment:
     patterns:
@@ -28,7 +28,9 @@ repository:
           '1': {name: punctuation.definition.comment.line.rhai}
   keywords:
     patterns:
-      - match: \b(using|macro|let|def|as|in|with|type|external|extending|where)\b
+      - match: \b(let|const|fn)\b
+        name: keyword.control.definition.rhai
+      - match: \b(using|macro|def|as|in|with|type|external|extending|where)\b
         name: keyword.control.definition.rhai
       - match: \b(if|else|switch|match|case)\b
         name: keyword.control.flow.rhai
@@ -36,20 +38,9 @@ repository:
         name: keyword.control.loop.rhai
       - match: \b(true|false)\b
         name: keyword.control.rhai
-      - include: '#trait'
-  trait:
-    begin: \b(trait)\b
-    beginCaptures:
-      '1': {name: storage.type.trait.rhai}
-    end: ([_0-9a-zA-Z]+)\s*[{;]
-    endCaptures:
-      '1': {name: entity.name.type.trait.rhai}
-    patterns:
-      - match: ([_0-9a-zA-Z]+)
-        name: storage.modifier.rhai
   operators:
     patterns:
-      - match: (===?|=!=|<=|>=|<>)
+      - match: (===?|=!=|<=|>=|<>|!=)
         name: keyword.operator.comparison.rhai
       - match: (\|>|/@|@@@|@@|@)
         name: keyword.operator.apply.rhai
@@ -79,30 +70,25 @@ repository:
         captures:
           '1': {name: constant.numeric.bin.rhai}
           '2': {name: keyword.control.handler.byte.rhai}
-      - match: ([\+\-]?(0|([1-9](([0-9]|_[0-9])+)?))(?:(?:\.(0|([1-9](([0-9]|_[0-9])+)?)))?\*\*[\+\-]?[1-9]_?[0-9]*|(?:\.[0-9_]*)))
+      - match: ([0-9]+(\.[0-9][0-9]?))
         captures:
           '1': {name: constant.numeric.decimal.rhai}
       - match: ([\+\-]?(0|[1-9][0-9]*))
         captures:
           '1': {name: constant.numeric.integer.rhai}
-      - match: (¯|¨)
-        captures:
-          '1': {name: constant.numeric.control.rhai}
   string:
     patterns:
       - name: string.quoted.block.rhai
-        begin: ([A-Za-z_][A-Za-z0-9_]*)?\s*(''')
+        begin: (''')
         beginCaptures:
-          '1': {name: keyword.control.handler.string.rhai}
-          '2': {name: punctuation.definition.string.block.rhai}
+          '1': {name: punctuation.definition.string.block.rhai}
         end: (''')
         endCaptures:
           '1': {name: punctuation.definition.string.block.rhai}
       - name: string.quoted.block.rhai
-        begin: ([A-Za-z_][A-Za-z0-9_]*)?\s*(""")
+        begin: (""")
         beginCaptures:
-          '1': {name: keyword.control.handler.string.rhai}
-          '2': {name: punctuation.definition.string.block.rhai}
+          '1': {name: punctuation.definition.string.block.rhai}
         end: (""")
         endCaptures:
           '1': {name: punctuation.definition.string.block.rhai}
@@ -111,14 +97,12 @@ repository:
             name: constant.character.escape.rhai
           - match: \\[^btnfr/"\\\n]
             name: invalid.illegal.escape.rhai
-      - match: ([A-Za-z_][A-Za-z0-9_]*)?\s*(\'[^'\\]*(?:\\.[^'\\]*)*\')
+      - match: (\'[^'\\]*(?:\\.[^'\\]*)*\')
         captures:
-          '1': {name: keyword.control.handler.string.rhai}
-          '2': {name: string.quoted.single.rhai}
-      - match: ([A-Za-z_][A-Za-z0-9_]*)?\s*("[^"\\]*(?:\\.[^"\\]*)*")
+          '1': {name: string.quoted.single.rhai}
+      - match: ("[^"\\]*(?:\\.[^"\\]*)*")
         captures:
-          '1': {name: keyword.control.handler.string.rhai}
-          '2': {name: string.quoted.single.rhai}
+          '1': {name: string.quoted.single.rhai}
         patterns:
           - match: \\([btnfr"\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})
             name: constant.character.escape.rhai
@@ -126,11 +110,7 @@ repository:
             name: invalid.illegal.escape.rhai
   symbol:
     patterns:
-      - match: (^@[a-zA-Z][_0-9a-zA-Z]*)
-        name: variable.parameter.macro.ts
-      - match: (\$[a-zA-Z][_0-9a-zA-Z]*)
-        name: variable.parameter.macro.ts
-      - match: ([_a-zA-Z][_0-9a-zA-Z]*)
+      - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\w)
         name: entity.name.function.rhai
       - match: (::)
         name: entity.name.function.namespace.rhai
