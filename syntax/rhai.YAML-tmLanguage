@@ -30,11 +30,13 @@ repository:
     patterns:
       - match: \b(let|const|fn)\b
         name: keyword.control.definition.rhai
-      - match: \b(using|macro|def|as|in|with|type|external|extending|where)\b
+      - match: \b(import)\b
         name: keyword.control.definition.rhai
       - match: \b(if|else|switch|match|case)\b
         name: keyword.control.flow.rhai
       - match: \b(do|while|loop|return|for|yield|break|pass)\b
+        name: keyword.control.loop.rhai
+      - match: \b(this)\b
         name: keyword.control.loop.rhai
       - match: \b(true|false)\b
         name: keyword.control.rhai
@@ -58,22 +60,19 @@ repository:
         name: keyword.operator.logical.rhai
   number:
     patterns:
-      - match: (?<!\w)(0x[0-9a-fA-F]+)(_[A-Za-z][A-Za-z0-9_]*)?(?!\w)
+      - match: (?<!\w)(0x[0-9a-fA-F]+)(?!\w)
         captures:
           '1': {name: constant.numeric.hex.rhai}
-          '2': {name: keyword.control.handler.byte.rhai}
-      - match: (?<!\w)(0o[0-7]+)(_[A-Za-z][A-Za-z0-9_]*)?(?!\w)
+      - match: (?<!\w)(0o[0-7]+)(?!\w)
         captures:
           '1': {name: constant.numeric.oct.rhai}
-          '2': {name: keyword.control.handler.byte.rhai}
-      - match: (?<!\w)(0b[01]+)(_[A-Za-z][A-Za-z0-9_]*)?(?!\w)
+      - match: (?<!\w)(0b[01]+)(?!\w)
         captures:
           '1': {name: constant.numeric.bin.rhai}
-          '2': {name: keyword.control.handler.byte.rhai}
-      - match: ([0-9]+(\.[0-9][0-9]?))
+      - match: ([0-9]+(\.[0-9][_0-9]?))
         captures:
           '1': {name: constant.numeric.decimal.rhai}
-      - match: ([\+\-]?(0|[1-9][0-9]*))
+      - match: ([\+\-]?(0|[1-9][_0-9]*))
         captures:
           '1': {name: constant.numeric.integer.rhai}
   string:
@@ -108,6 +107,15 @@ repository:
             name: constant.character.escape.rhai
           - match: \\[^btnfr/"\\\n]
             name: invalid.illegal.escape.rhai
+  dict:
+    patterns:
+      - name: string.quoted.block.rhai
+        begin: (#\{)
+        beginCaptures:
+          '1': {name: punctuation.definition.string.block.rhai}
+        end: (\})
+        endCaptures:
+          '1': {name: punctuation.definition.string.block.rhai}
   symbol:
     patterns:
       - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\w)
