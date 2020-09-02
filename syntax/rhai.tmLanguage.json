@@ -71,7 +71,7 @@
                     "name": "keyword.control.flow.rhai"
                 },
                 {
-                    "match": "\\b(do|while|loop|return|for|yield|break|pass)\\b",
+                    "match": "\\b(do|while|loop|return|for|in|yield|break|continue)\\b",
                     "name": "keyword.control.loop.rhai"
                 },
                 {
@@ -81,6 +81,10 @@
                 {
                     "match": "\\b(true|false)\\b",
                     "name": "keyword.control.rhai"
+                },
+                {
+                    "match": "\\b(print|range)\\b",
+                    "name": "support.function.rhai"
                 }
             ]
         },
@@ -255,6 +259,10 @@
         },
         "symbol": {
             "patterns": [
+                {
+                    "match": "(?<!\\w)([A-Z][_0-9A-Z]*)(?!\\w)",
+                    "name": "constant.language.const.rhai"
+                },
                 {
                     "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\\w)",
                     "name": "entity.name.function.rhai"
