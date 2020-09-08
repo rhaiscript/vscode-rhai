@@ -2,15 +2,18 @@
 .vscode
 .idea
 .vs
+*.iml
 
 # Node
-node_modules
+node_modules/
+dist/
+package-lock.json
 yarn.lock
 yarn-error.log
-package-lock.json
-.vsixmanifest
 
 # Release
+.vsixmanifest
 *.vsix
 *.tgz
-dist/
+*.nb
+*.ps1

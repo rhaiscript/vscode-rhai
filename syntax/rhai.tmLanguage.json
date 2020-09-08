@@ -10,16 +10,7 @@
             "include": "#comment"
         },
         {
-            "include": "#keywords"
-        },
-        {
-            "include": "#string"
-        },
-        {
-            "include": "#number"
-        },
-        {
-            "include": "#symbol"
+            "include": "#literal"
         }
     ],
     "repository": {
@@ -53,6 +44,25 @@
                             "name": "punctuation.definition.comment.line.rhai"
                         }
                     }
+                }
+            ]
+        },
+        "literal": {
+            "patterns": [
+                {
+                    "include": "#keywords"
+                },
+                {
+                    "include": "#string"
+                },
+                {
+                    "include": "#number"
+                },
+                {
+                    "include": "#symbol"
+                },
+                {
+                    "include": "#dict"
                 }
             ]
         },
@@ -241,19 +251,30 @@
         "dict": {
             "patterns": [
                 {
-                    "name": "string.quoted.block.rhai",
                     "begin": "(#\\{)",
                     "beginCaptures": {
                         "1": {
-                            "name": "punctuation.definition.string.block.rhai"
+                            "name": "variable.other.readwrite.begin.rhai"
                         }
                     },
                     "end": "(\\})",
                     "endCaptures": {
                         "1": {
-                            "name": "punctuation.definition.string.block.rhai"
+                            "name": "variable.other.readwrite.end.rhai"
                         }
-                    }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#comment"
+                        },
+                        {
+                            "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)\\s*(:)(?!\\w)",
+                            "name": "variable.other.readwrite.rhai"
+                        },
+                        {
+                            "include": "#literal"
+                        }
+                    ]
                 }
             ]
         },
@@ -266,10 +287,6 @@
                 {
                     "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\\w)",
                     "name": "entity.name.function.rhai"
-                },
-                {
-                    "match": "(::)",
-                    "name": "entity.name.function.namespace.rhai"
                 }
             ]
         }

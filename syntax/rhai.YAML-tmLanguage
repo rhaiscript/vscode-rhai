@@ -5,11 +5,7 @@ information_for_contributors:
   - 'aster: galaster@foxmail.com'
 patterns:
   - include: '#comment'
-  - include: '#keywords'
-  - include: '#string'
-  - include: '#number'
-  - include: '#symbol'
-#  - include: '#operators'
+  - include: '#literal'
 repository:
   comment:
     patterns:
@@ -26,6 +22,14 @@ repository:
         match: (//).*$\n?
         captures:
           '1': {name: punctuation.definition.comment.line.rhai}
+  literal:
+    patterns:
+      - include: '#keywords'
+      - include: '#string'
+      - include: '#number'
+      - include: '#symbol'
+      - include: '#dict'
+    #  - include: '#operators'
   keywords:
     patterns:
       - match: \b(let|const|fn)\b
@@ -111,19 +115,22 @@ repository:
             name: invalid.illegal.escape.rhai
   dict:
     patterns:
-      - name: string.quoted.block.rhai
-        begin: (#\{)
+      - begin: (#\{)
         beginCaptures:
-          '1': {name: punctuation.definition.string.block.rhai}
+          '1': {name: variable.other.readwrite.begin.rhai}
         end: (\})
         endCaptures:
-          '1': {name: punctuation.definition.string.block.rhai}
+          '1': {name: variable.other.readwrite.end.rhai}
+        patterns:
+          - include: '#comment'
+          - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)\s*(:)(?!\w)
+            name: variable.other.readwrite.rhai
+          - include: '#literal'
   symbol:
     patterns:
       - match: (?<!\w)([A-Z][_0-9A-Z]*)(?!\w)
         name: constant.language.const.rhai
       - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\w)
         name: entity.name.function.rhai
-      - match: (::)
-        name: entity.name.function.namespace.rhai
+
 
