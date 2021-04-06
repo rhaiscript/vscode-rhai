@@ -24,5 +24,5 @@ How to build
 
 ```sh
 node ./node_modules/vscode/bin/install && tsc
-bsce package
+vsce package
 ```
