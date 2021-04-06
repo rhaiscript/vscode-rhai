@@ -1,16 +1,18 @@
 import * as vscode from 'vscode'
 import * as child_process from 'child_process'
 
-import {
-    LanguageClient,
-    LanguageClientOptions,
-    Executable,
-} from 'vscode-languageclient'
+import
+    {
+        LanguageClient,
+        LanguageClientOptions,
+        Executable,
+    } from 'vscode-languageclient'
 
 
 let client: LanguageClient
 
-function start_client() {
+function start_client()
+{
     let serverOptions: Executable = {
         command: 'rhai-lsp',
     }
@@ -21,7 +23,7 @@ function start_client() {
 
     client = new LanguageClient(
         'rhaiLanguageServer',
-        'Rhai Server',
+        'Rhai Language Server',
         serverOptions,
         clientOptions,
     )
@@ -30,15 +32,18 @@ function start_client() {
 }
 
 
-async function is_installed(cmd: string): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
+async function is_installed(cmd: string): Promise<boolean>
+{
+    return new Promise<boolean>((resolve) =>
+    {
         const checkCommand = process.platform === 'win32' ? 'where' : 'command -v'
         const proc = child_process.exec(`${checkCommand} ${cmd}`)
         proc.on('exit', (code) => { resolve(code === 0) })
     })
 }
 
-async function installServerBinary(): Promise<boolean> {
+async function installServerBinary(): Promise<boolean>
+{
     await is_installed('cargo')
     // cargo install
     // download from github
@@ -49,13 +54,16 @@ async function installServerBinary(): Promise<boolean> {
         'rhai-lsp',
         new vscode.ShellExecution('cargo install rhai-lsp'),
     )
-    const promise = new Promise<boolean>((resolve) => {
-        vscode.tasks.onDidEndTask((e) => {
+    const promise = new Promise<boolean>((resolve) =>
+    {
+        vscode.tasks.onDidEndTask((e) =>
+        {
             if (e.execution.task === task) {
                 e.execution.terminate()
             }
         })
-        vscode.tasks.onDidEndTaskProcess((e) => {
+        vscode.tasks.onDidEndTaskProcess((e) =>
+        {
             resolve(e.exitCode === 0)
         })
     })
@@ -64,7 +72,8 @@ async function installServerBinary(): Promise<boolean> {
     return promise
 }
 
-async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfiguration) {
+async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfiguration)
+{
     const selected = await vscode.window.showInformationMessage(
         'Install rhai-lsp-server (Rust toolchain required) ?',
         'Install',
@@ -81,7 +90,8 @@ async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfigu
     }
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext)
+{
     const configuration = vscode.workspace.getConfiguration('notedown')
     const useLanguageServer = configuration.get<boolean>('useLanguageServer')
     const shouldStartClient = useLanguageServer && (await is_installed('rhai-lsp'))
@@ -92,7 +102,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 }
 
-export function deactivate(): Thenable<void> | undefined {
+export function deactivate(): Thenable<void> | undefined
+{
     if (!client) {
         return undefined
     }

@@ -1,294 +1,357 @@
 {
-    "version": "v0.4.0",
-    "scopeName": "source.rhai",
-    "uuid": "1e76f176-ee1c-4331-a781-eb21c0da77cf",
-    "information_for_contributors": [
-        "aster: galaster@foxmail.com"
-    ],
-    "patterns": [
-        {
-            "include": "#comment"
-        },
-        {
-            "include": "#literal"
-        }
-    ],
-    "repository": {
-        "comment": {
-            "patterns": [
-                {
-                    "name": "comment.block.rhai",
-                    "begin": "(/\\*)",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.comment.block.rhai"
-                        }
-                    },
-                    "end": "(\\*/)",
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.comment.block.rhai"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#comment"
-                        }
-                    ]
-                },
-                {
-                    "name": "comment.line.rhai",
-                    "match": "(//).*$\\n?",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.comment.line.rhai"
-                        }
-                    }
-                }
-            ]
-        },
-        "literal": {
-            "patterns": [
-                {
-                    "include": "#keywords"
-                },
-                {
-                    "include": "#string"
-                },
-                {
-                    "include": "#number"
-                },
-                {
-                    "include": "#symbol"
-                },
-                {
-                    "include": "#dict"
-                }
-            ]
-        },
-        "keywords": {
-            "patterns": [
-                {
-                    "match": "\\b(let|const|fn)\\b",
-                    "name": "keyword.control.definition.rhai"
-                },
-                {
-                    "match": "\\b(import)\\b",
-                    "name": "keyword.control.definition.rhai"
-                },
-                {
-                    "match": "\\b(if|else|switch|match|case)\\b",
-                    "name": "keyword.control.flow.rhai"
-                },
-                {
-                    "match": "\\b(do|while|loop|return|for|in|yield|break|continue)\\b",
-                    "name": "keyword.control.loop.rhai"
-                },
-                {
-                    "match": "\\b(this)\\b",
-                    "name": "keyword.control.loop.rhai"
-                },
-                {
-                    "match": "\\b(true|false)\\b",
-                    "name": "keyword.control.rhai"
-                },
-                {
-                    "match": "\\b(print|range)\\b",
-                    "name": "support.function.rhai"
-                }
-            ]
-        },
-        "operators": {
-            "patterns": [
-                {
-                    "match": "(===?|=!=|<=|>=|<>|!=)",
-                    "name": "keyword.operator.comparison.rhai"
-                },
-                {
-                    "match": "(\\|>|/@|@@@|@@|@)",
-                    "name": "keyword.operator.apply.rhai"
-                },
-                {
-                    "match": "(-|\\+|\\*|\\/|\\^)",
-                    "name": "keyword.operator.arithmetic.rhai"
-                },
-                {
-                    "match": "(\\?=|:=|=)",
-                    "name": "keyword.operator.assignment.rhai"
-                },
-                {
-                    "match": "(∈|<:|:>|<-|->|:?)",
-                    "name": "keyword.operator.set.rhai"
-                },
-                {
-                    "match": "(<|>)",
-                    "name": "keyword.operator.comparison.rhai"
-                },
-                {
-                    "match": "(!|¬)",
-                    "name": "keyword.operator.infix.rhai"
-                },
-                {
-                    "match": "(\\?|°)",
-                    "name": "keyword.operator.logical.rhai"
-                }
-            ]
-        },
-        "number": {
-            "patterns": [
-                {
-                    "match": "(?<!\\w)(0x[0-9a-fA-F]+)(?!\\w)",
-                    "captures": {
-                        "1": {
-                            "name": "constant.numeric.hex.rhai"
-                        }
-                    }
-                },
-                {
-                    "match": "(?<!\\w)(0o[0-7]+)(?!\\w)",
-                    "captures": {
-                        "1": {
-                            "name": "constant.numeric.oct.rhai"
-                        }
-                    }
-                },
-                {
-                    "match": "(?<!\\w)(0b[01]+)(?!\\w)",
-                    "captures": {
-                        "1": {
-                            "name": "constant.numeric.bin.rhai"
-                        }
-                    }
-                },
-                {
-                    "match": "([0-9]+(\\.[0-9][_0-9]?))",
-                    "captures": {
-                        "1": {
-                            "name": "constant.numeric.decimal.rhai"
-                        }
-                    }
-                },
-                {
-                    "match": "([\\+\\-]?(0|[1-9][_0-9]*))",
-                    "captures": {
-                        "1": {
-                            "name": "constant.numeric.integer.rhai"
-                        }
-                    }
-                }
-            ]
-        },
-        "string": {
-            "patterns": [
-                {
-                    "name": "string.quoted.block.rhai",
-                    "begin": "(''')",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.string.block.rhai"
-                        }
-                    },
-                    "end": "(''')",
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.string.block.rhai"
-                        }
-                    }
-                },
-                {
-                    "name": "string.quoted.block.rhai",
-                    "begin": "(\"\"\")",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.string.block.rhai"
-                        }
-                    },
-                    "end": "(\"\"\")",
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.definition.string.block.rhai"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "match": "\\\\([btnfr\"\\\\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
-                            "name": "constant.character.escape.rhai"
-                        },
-                        {
-                            "match": "\\\\[^btnfr/\"\\\\\\n]",
-                            "name": "invalid.illegal.escape.rhai"
-                        }
-                    ]
-                },
-                {
-                    "match": "(\\'[^'\\\\]*(?:\\\\.[^'\\\\]*)*\\')",
-                    "captures": {
-                        "1": {
-                            "name": "string.quoted.single.rhai"
-                        }
-                    }
-                },
-                {
-                    "match": "(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")",
-                    "captures": {
-                        "1": {
-                            "name": "string.quoted.single.rhai"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "match": "\\\\([btnfr\"\\\\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
-                            "name": "constant.character.escape.rhai"
-                        },
-                        {
-                            "match": "\\\\[^btnfr/\"\\\\\\n]",
-                            "name": "invalid.illegal.escape.rhai"
-                        }
-                    ]
-                }
-            ]
-        },
-        "dict": {
-            "patterns": [
-                {
-                    "begin": "(#\\{)",
-                    "beginCaptures": {
-                        "1": {
-                            "name": "variable.other.readwrite.begin.rhai"
-                        }
-                    },
-                    "end": "(\\})",
-                    "endCaptures": {
-                        "1": {
-                            "name": "variable.other.readwrite.end.rhai"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#comment"
-                        },
-                        {
-                            "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)\\s*(:)(?!\\w)",
-                            "name": "variable.other.readwrite.rhai"
-                        },
-                        {
-                            "include": "#literal"
-                        }
-                    ]
-                }
-            ]
-        },
-        "symbol": {
-            "patterns": [
-                {
-                    "match": "(?<!\\w)([A-Z][_0-9A-Z]*)(?!\\w)",
-                    "name": "constant.language.const.rhai"
-                },
-                {
-                    "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\\w)",
-                    "name": "entity.name.function.rhai"
-                }
-            ]
-        }
+  "version": "v0.5.0",
+  "scopeName": "source.rhai",
+  "uuid": "1e76f176-ee1c-4331-a781-eb21c0da77cf",
+  "information_for_contributors": [
+    "aster: galaster@foxmail.com",
+    "schungx: schungx@live.com"
+  ],
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#literal"
     }
+  ],
+  "repository": {
+    "comment": {
+      "patterns": [
+        {
+          "name": "comment.block.documentation.rhai",
+          "begin": "(/\\*\\*)[^\\*]",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.comment.block.documentation.rhai"
+            }
+          },
+          "end": "(\\*/)",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.comment.block.documentation.rhai"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "name": "comment.block.rhai",
+          "begin": "(/\\*)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.comment.block.rhai"
+            }
+          },
+          "end": "(\\*/)",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.comment.block.rhai"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "name": "comment.line.documentation.rhai",
+          "match": "(///)[^/].*$\\n?",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.line.rhai"
+            }
+          }
+        },
+        {
+          "name": "comment.line.rhai",
+          "match": "(//).*$\\n?",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.line.rhai"
+            }
+          }
+        }
+      ]
+    },
+    "literal": {
+      "patterns": [
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#symbol"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#dict"
+        },
+        {
+          "include": "#operators"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "\\b(let|const)\\b",
+          "name": "keyword.control.definition.rhai"
+        },
+        {
+          "match": "\\b(fn|Fn)\\b",
+          "name": "keyword.control.definition.function.rhai"
+        },
+        {
+          "match": "\\b(import|export|as)\\b",
+          "name": "keyword.control.import.rhai"
+        },
+        {
+          "match": "\\b(if|else)\\b",
+          "name": "keyword.control.conditional.rhai"
+        },
+        {
+          "match": "\\b(switch|return|throw|try|catch)\\b",
+          "name": "keyword.control.flow.rhai"
+        },
+        {
+          "match": "\\b(do|while|loop|until|for|in|break|continue)\\b",
+          "name": "keyword.control.loop.rhai"
+        },
+        {
+          "match": "\\b(this)\\b",
+          "name": "variable.language.rhai"
+        },
+        {
+          "match": "\\b(true|false)\\b",
+          "name": "constant.language.rhai"
+        },
+        {
+          "match": "\\b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\\b",
+          "name": "keyword.other.rhai"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "(==|!=|<=|>=|<|>)",
+          "name": "keyword.operator.comparison.rhai"
+        },
+        {
+          "match": "(\\+|\\-|\\*|\\/|\\*\\*|%)",
+          "name": "keyword.operator.arithmetic.rhai"
+        },
+        {
+          "match": "(\\||&|>>|<<)",
+          "name": "keyword.operator.bitwise.rhai"
+        },
+        {
+          "match": "(=|\\+=|\\-=|\\*=|\\/=|\\*\\*=|%=|\\|=|&=|>>=|<<=)",
+          "name": "keyword.operator.assignment.rhai"
+        },
+        {
+          "match": "(!)",
+          "name": "keyword.operator.infix.rhai"
+        },
+        {
+          "match": "(\\|\\||&&)",
+          "name": "keyword.operator.logical.rhai"
+        }
+      ]
+    },
+    "number": {
+      "patterns": [
+        {
+          "match": "(?<!\\w)(0x[0-9a-fA-F][_0-9a-fA-F]*)(?!\\w)",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.hex.rhai"
+            }
+          }
+        },
+        {
+          "match": "(?<!\\w)(0o[0-7][_0-7]*)(?!\\w)",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.oct.rhai"
+            }
+          }
+        },
+        {
+          "match": "(?<!\\w)(0b[01][_01]*)(?!\\w)",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.bin.rhai"
+            }
+          }
+        },
+        {
+          "match": "([\\+\\-]?[0-9][_0-9]*(\\.([0-9][_0-9]*)?))",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.decimal.rhai"
+            }
+          }
+        },
+        {
+          "match": "([\\+\\-]?[0-9][_0-9]*(\\.[0-9][_0-9]*)?e[\\+\\-]?[0-9][_0-9]*)",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.decimal.rhai"
+            }
+          }
+        },
+        {
+          "match": "([\\+\\-]?([0-9][_0-9]*))",
+          "captures": {
+            "1": {
+              "name": "constant.numeric.integer.rhai"
+            }
+          }
+        }
+      ]
+    },
+    "string": {
+      "patterns": [
+        {
+          "name": "string.quoted.block.rhai",
+          "begin": "('`')",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.block.rhai"
+            }
+          },
+          "end": "('`')",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.block.rhai"
+            }
+          }
+        },
+        {
+          "match": "(\\'[^'\\\\]*(?:\\\\.[^'\\\\]*)*\\')",
+          "captures": {
+            "1": {
+              "name": "string.quoted.single.rhai"
+            }
+          }
+        },
+        {
+          "match": "(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")",
+          "captures": {
+            "1": {
+              "name": "string.quoted.single.rhai"
+            }
+          },
+          "patterns": [
+            {
+              "match": "\\\\([btnfr\"\\\\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
+              "name": "constant.character.escape.rhai"
+            },
+            {
+              "match": "\\\\[^btnfr/\"\\\\\\n]",
+              "name": "invalid.illegal.escape.rhai"
+            }
+          ]
+        }
+      ]
+    },
+    "dict": {
+      "patterns": [
+        {
+          "begin": "(#\\{)",
+          "beginCaptures": {
+            "1": {
+              "name": "variable.other.readwrite.begin.rhai"
+            }
+          },
+          "end": "(\\})",
+          "endCaptures": {
+            "1": {
+              "name": "variable.other.readwrite.end.rhai"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#comment"
+            },
+            {
+              "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)\\s*(:)\\s*(?!\\w)",
+              "name": "variable.other.readwrite.rhai"
+            },
+            {
+              "include": "#literal"
+            }
+          ]
+        }
+      ]
+    },
+    "symbol": {
+      "patterns": [
+        {
+          "match": "(::)",
+          "name": "punctuation.accessor"
+        },
+        {
+          "match": "(:|=>)",
+          "name": "punctuation.separator"
+        },
+        {
+          "match": "(;)",
+          "name": "punctuation.terminator"
+        },
+        {
+          "match": "(\\{)",
+          "name": "punctuation.section.block.begin"
+        },
+        {
+          "match": "(\\})",
+          "name": "punctuation.section.block.end"
+        },
+        {
+          "match": "(\\()",
+          "name": "punctuation.section.group.begin"
+        },
+        {
+          "match": "(\\))",
+          "name": "punctuation.section.group.end"
+        },
+        {
+          "match": "(\\[)",
+          "name": "punctuation.section.brackets.begin"
+        },
+        {
+          "match": "(\\])",
+          "name": "punctuation.section.brackets.end"
+        }
+      ]
+    },
+    "variable": {
+      "patterns": [
+        {
+          "match": "(?<!\\w)([A-Z][_0-9A-Z]*)(?!\\w)",
+          "name": "variable.other.constant.rhai"
+        },
+        {
+          "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?=\\(|\\!\\()",
+          "name": "entity.name.function.rhai"
+        },
+        {
+          "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\\w)",
+          "name": "variable.other.readwrite.rhai"
+        }
+      ]
+    }
+  }
 }

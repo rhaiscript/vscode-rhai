@@ -52,12 +52,11 @@
             "open": "`",
             "close": "`",
             "notIn": [
-                "string",
-                "comment"
+                "string"
             ]
         },
         {
-            "open": "/**",
+            "open": "/*",
             "close": " */",
             "notIn": [
                 "string"
