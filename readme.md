@@ -1,22 +1,28 @@
-[Rhai](https://github.com/jonathandturner/rhai) support for VSCode
-==================================================================
+Rhai Language Support for Visual Studio Code
+===========================================
 
-**[Rhai](https://github.com/jonathandturner/rhai) - Embedded Scripting for Rust**
+[![Rhai logo](https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.svg)](https://rhai.rs)
+
+[Rhai](https://rhai.rs) is an embedded scripting language and evaluation engine for Rust that gives
+a safe and easy way to add scripting to any application.
 
 
-## Features
+Features
+--------
 
 - [x] Highlight
 
 
-## Todo list
+Todo list
+---------
 
 - [ ] formatter
 
-## Developer
+
+How to build
+------------
 
 ```sh
 node ./node_modules/vscode/bin/install && tsc
 bsce package
 ```
-
