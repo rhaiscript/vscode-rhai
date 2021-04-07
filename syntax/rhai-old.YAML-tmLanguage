@@ -1,0 +1,178 @@
+version: v0.6.0
+scopeName: source.rhai
+uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
+information_for_contributors:
+  - 'aster: galaster@foxmail.com'
+  - 'schungx: schungx@live.com'
+patterns:
+  - include: '#comment'
+  - include: '#literal'
+  - include: '#operator'
+repository:
+  comment:
+    patterns:
+      - name: comment.block.documentation.rhai
+        begin: (/\*\*)[^\*]
+        beginCaptures:
+          '1': {name: punctuation.definition.comment.block.documentation.rhai}
+        end: (\*/)
+        endCaptures:
+          '1': {name: punctuation.definition.comment.block.documentation.rhai}
+        patterns:
+          - include: '#comment'
+      - name: comment.block.rhai
+        begin: (/\*)
+        beginCaptures:
+          '1': {name: punctuation.definition.comment.block.rhai}
+        end: (\*/)
+        endCaptures:
+          '1': {name: punctuation.definition.comment.block.rhai}
+        patterns:
+          - include: '#comment'
+      - name: comment.line.documentation.rhai
+        match: (///)[^/].*$\n?
+        captures:
+          '1': {name: punctuation.definition.comment.line.rhai}
+      - name: comment.line.rhai
+        match: (//).*$\n?
+        captures:
+          '1': {name: punctuation.definition.comment.line.rhai}
+
+  literal:
+    patterns:
+      - include: '#keyword'
+      - include: '#string'
+      - include: '#number'
+      - include: '#symbol'
+      - include: '#variable'
+
+  keyword:
+    patterns:
+      - match: \b(let|const)\b
+        name: keyword.control.definition.rhai
+      - match: \b(fn|Fn)\b
+        name: keyword.control.definition.function.rhai storage.type.function.rhai keyword.declaration.function.rhai
+      - match: \b(import|export|as|private)\b
+        name: keyword.control.import.rhai keyword.control.export.rhai
+      - match: \b(if|else)\b
+        name: keyword.control.conditional.rhai
+      - match: \b(switch|return|throw|try|catch)\b
+        name: keyword.control.flow.rhai
+      - match: \b(do|while|loop|until|for|in|break|continue)\b
+        name: keyword.control.loop.rhai
+      - match: \b(this)\b
+        name: variable.language.rhai
+      - match: \b(true|false)\b
+        name: constant.language.rhai
+      - match: \b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\b
+        name: keyword.other.rhai support.function.rhai
+      - match: \b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\b
+        name: invalid.illegal.rhai
+
+  operator:
+    patterns:
+      - match: (==|!=|<=|>=|<|>)
+        name: keyword.operator.comparison.rhai
+      - match: (\+|-|\*|/|\*\*|%)
+        name: keyword.operator.arithmetic.rhai
+      - match: (\||&|>>|<<|\^)
+        name: keyword.operator.bitwise.rhai
+      - match: (=|\+=|-=|\*=|/=|\*\*=|%=|\|=|&=|\^=|>>=|<<=)
+        name: keyword.operator.assignment.rhai
+      - match: (!)
+        name: keyword.operator.infix.rhai
+      - match: (\|\||&&)
+        name: keyword.operator.logical.rhai
+
+  number:
+    patterns:
+      - match: (?<!\w)(0x\h[_0-9a-fA-F]*)(?!\w)
+        name: constant.numeric.hex.rhai
+      - match: (?<!\w)(0o[0-7][_0-7]*)(?!\w)
+        name: constant.numeric.oct.rhai}
+      - match: (?<!\w)(0b[01][_01]*)(?!\w)
+        name: constant.numeric.bin.rhai
+      - match: ([\+-]?[0-9][_0-9]*(\.[0-9][_0-9]*)?e[\+-]?[0-9][_0-9]*)
+        name: constant.numeric.decimal.rhai
+      - match: ([\+-]?[0-9][_0-9]*(\.([0-9][_0-9]*)?))
+        name: constant.numeric.decimal.rhai
+      - match: ([\+-]?[0-9][_0-9]*)
+        name: constant.numeric.integer.rhai
+
+  literal-string:
+    - match: '`'
+      scope: punctuation.definition.string.begin.rhai
+      set:
+        - meta_include_prototype: false
+        - meta_scope: meta.string.rhai string.quoted.other.rhai
+        - match: "`"
+          scope: punctuation.definition.string.end.rhai
+          pop: true
+        - match: '\$\{'
+          scope: punctuation.section.interpolation.begin.rhai
+          push:
+            - clear_scopes: 1
+            - meta_scope: meta.interpolation.rhai
+            - meta_content_scope: source.rhai.embedded
+            - match: '\}'
+              scope: punctuation.section.interpolation.end.rhai
+              pop: true
+            - match: (?=\S)
+              push: expression
+        - include: string-content
+
+  string:
+    patterns:
+      - name: string.quoted.block.rhai meta.string.rhai
+        begin: (`)
+        beginCaptures:
+          '1': {name: punctuation.definition.string.begin.rhai}
+        end: (`)
+        endCaptures:
+          '1': {name: punctuation.definition.string.end.rhai}
+      - match: ('([^'\\]|\\([tnr'\\]|x\h{2}|u\h{4}|U\h{8}))')
+        name: string.quoted.single.rhai meta.string.rhai
+        patterns:
+          - match: \\([tnr'\\]|x\h{2}|u\h{4}|U\h{8})
+            name: constant.character.escape.rhai
+      - match: ("[^"\\]*(?:\\.[^"\\]*)*")
+        name: string.quoted.single.rhai meta.string.rhai
+        patterns:
+          - match: \\([tnr"\\\n]|x\h{2}|u\h{4}|U\h{8})
+            name: constant.character.escape.rhai
+  
+  symbol:
+    patterns:
+      - match: (\:\:)
+        name: punctuation.accessor.rhai
+      - match: (\:|=>|,)
+        name: punctuation.separator.rhai
+      - match: (;)
+        name: punctuation.terminator.rhai
+      - match: (\.)
+        name: punctuation.accessor.rhai
+      - match: (\{)
+        name: punctuation.section.block.begin.rhai
+      - match: (\})
+        name: punctuation.section.block.end.rhai
+      - match: (\()
+        name: punctuation.section.group.begin.rhai
+      - match: (\))
+        name: punctuation.section.group.end.rhai
+      - match: (\[)
+        name: punctuation.section.brackets.begin.rhai
+      - match: (\])
+        name: punctuation.section.brackets.end.rhai
+      - match: (\(\*|\*\)|#!|\+\+|--|\.\.|\.\.\.|~|#|@|\$|->|<-|===|!==|\:=|\:\:<)
+        name: invalid.illegal.rhai
+  
+  variable:
+    patterns:
+      - match: (?<!\w)([A-Z][_0-9A-Z]*)(?!\w)
+        name: entity.name.constant.rhai variable.other.constant.rhai
+      - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)(?=\(|\!\()
+        name: variable.function
+      - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\w)
+        name: variable.other.readwrite.rhai
+      - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*\s*\:\:)+\s*(?=\w)
+        name: entity.name.namespace.rhai meta.path.rhai

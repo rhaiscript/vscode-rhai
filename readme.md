@@ -17,6 +17,7 @@ Todo list
 ---------
 
 - [ ] Auto formatter
+- [ ] Language server
 
 
 How to build
