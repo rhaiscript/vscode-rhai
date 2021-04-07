@@ -80,7 +80,7 @@
     "literal": {
       "patterns": [
         {
-          "include": "#keywords"
+          "include": "#keyword"
         },
         {
           "include": "#string"
@@ -102,7 +102,7 @@
         }
       ]
     },
-    "keywords": {
+    "keyword": {
       "patterns": [
         {
           "match": "\\b(let|const)\\b",
@@ -110,11 +110,11 @@
         },
         {
           "match": "\\b(fn|Fn)\\b",
-          "name": "keyword.control.definition.function.rhai"
+          "name": "keyword.control.definition.function.rhai storage.type.function.rhai keyword.declaration.function.rhai"
         },
         {
-          "match": "\\b(import|export|as)\\b",
-          "name": "keyword.control.import.rhai"
+          "match": "\\b(import|export|as|private)\\b",
+          "name": "keyword.control.import.rhai keyword.control.export.rhai"
         },
         {
           "match": "\\b(if|else)\\b",
@@ -138,7 +138,11 @@
         },
         {
           "match": "\\b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\\b",
-          "name": "keyword.other.rhai"
+          "name": "keyword.other.rhai support.function.rhai"
+        },
+        {
+          "match": "\\b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\\b",
+          "name": "invalid.illegal.rhai"
         }
       ]
     },
@@ -149,15 +153,15 @@
           "name": "keyword.operator.comparison.rhai"
         },
         {
-          "match": "(\\+|\\-|\\*|\\/|\\*\\*|%)",
+          "match": "(\\+|-|\\*|/|\\*\\*|%)",
           "name": "keyword.operator.arithmetic.rhai"
         },
         {
-          "match": "(\\||&|>>|<<)",
+          "match": "(\\||&|>>|<<|^)",
           "name": "keyword.operator.bitwise.rhai"
         },
         {
-          "match": "(=|\\+=|\\-=|\\*=|\\/=|\\*\\*=|%=|\\|=|&=|>>=|<<=)",
+          "match": "(=|\\+=|-=|\\*=|/=|\\*\\*=|%=|\\|=|&=|^=|>>=|<<=)",
           "name": "keyword.operator.assignment.rhai"
         },
         {
@@ -174,51 +178,27 @@
       "patterns": [
         {
           "match": "(?<!\\w)(0x[0-9a-fA-F][_0-9a-fA-F]*)(?!\\w)",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.hex.rhai"
-            }
-          }
+          "name": "constant.numeric.hex.rhai"
         },
         {
           "match": "(?<!\\w)(0o[0-7][_0-7]*)(?!\\w)",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.oct.rhai"
-            }
-          }
+          "name": "constant.numeric.oct.rhai}"
         },
         {
           "match": "(?<!\\w)(0b[01][_01]*)(?!\\w)",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.bin.rhai"
-            }
-          }
+          "name": "constant.numeric.bin.rhai"
         },
         {
-          "match": "([\\+\\-]?[0-9][_0-9]*(\\.([0-9][_0-9]*)?))",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.decimal.rhai"
-            }
-          }
+          "match": "([\\+-]?[0-9][_0-9]*(\\.[0-9][_0-9]*)?e[\\+-]?[0-9][_0-9]*)",
+          "name": "constant.numeric.decimal.rhai"
         },
         {
-          "match": "([\\+\\-]?[0-9][_0-9]*(\\.[0-9][_0-9]*)?e[\\+\\-]?[0-9][_0-9]*)",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.decimal.rhai"
-            }
-          }
+          "match": "([\\+-]?[0-9][_0-9]*(\\.([0-9][_0-9]*)?))",
+          "name": "constant.numeric.decimal.rhai"
         },
         {
-          "match": "([\\+\\-]?([0-9][_0-9]*))",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.integer.rhai"
-            }
-          }
+          "match": "([\\+-]?[0-9][_0-9]*)",
+          "name": "constant.numeric.integer.rhai"
         }
       ]
     },
@@ -229,39 +209,33 @@
           "begin": "('`')",
           "beginCaptures": {
             "1": {
-              "name": "punctuation.definition.string.block.rhai"
+              "name": "punctuation.definition.string.begin.rhai"
             }
           },
           "end": "('`')",
           "endCaptures": {
             "1": {
-              "name": "punctuation.definition.string.block.rhai"
+              "name": "punctuation.definition.string.end.rhai"
             }
           }
         },
         {
-          "match": "(\\'[^'\\\\]*(?:\\\\.[^'\\\\]*)*\\')",
-          "captures": {
-            "1": {
-              "name": "string.quoted.single.rhai"
+          "match": "('([^'\\\\]|\\\\([tnr'\\\\]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8}))')",
+          "name": "string.quoted.single.rhai",
+          "patterns": [
+            {
+              "match": "\\\\([tnr'\\\\]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
+              "name": "constant.character.escape.rhai"
             }
-          }
+          ]
         },
         {
           "match": "(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")",
-          "captures": {
-            "1": {
-              "name": "string.quoted.single.rhai"
-            }
-          },
+          "name": "string.quoted.single.rhai",
           "patterns": [
             {
-              "match": "\\\\([btnfr\"\\\\\\n/]|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
+              "match": "\\\\([tnr\"\\\\\\n]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
               "name": "constant.character.escape.rhai"
-            },
-            {
-              "match": "\\\\[^btnfr/\"\\\\\\n]",
-              "name": "invalid.illegal.escape.rhai"
             }
           ]
         }
@@ -300,40 +274,48 @@
     "symbol": {
       "patterns": [
         {
-          "match": "(::)",
-          "name": "punctuation.accessor"
+          "match": "(\\:\\:)",
+          "name": "punctuation.accessor.rhai"
         },
         {
-          "match": "(:|=>)",
-          "name": "punctuation.separator"
+          "match": "(\\:|=>|,)",
+          "name": "punctuation.separator.rhai"
         },
         {
           "match": "(;)",
-          "name": "punctuation.terminator"
+          "name": "punctuation.terminator.rhai"
+        },
+        {
+          "match": "(\\.)",
+          "name": "punctuation.accessor.rhai"
         },
         {
           "match": "(\\{)",
-          "name": "punctuation.section.block.begin"
+          "name": "punctuation.section.block.begin.rhai"
         },
         {
           "match": "(\\})",
-          "name": "punctuation.section.block.end"
+          "name": "punctuation.section.block.end.rhai"
         },
         {
           "match": "(\\()",
-          "name": "punctuation.section.group.begin"
+          "name": "punctuation.section.group.begin.rhai"
         },
         {
           "match": "(\\))",
-          "name": "punctuation.section.group.end"
+          "name": "punctuation.section.group.end.rhai"
         },
         {
           "match": "(\\[)",
-          "name": "punctuation.section.brackets.begin"
+          "name": "punctuation.section.brackets.begin.rhai"
         },
         {
           "match": "(\\])",
-          "name": "punctuation.section.brackets.end"
+          "name": "punctuation.section.brackets.end.rhai"
+        },
+        {
+          "match": "(\\(\\*|\\*\\)|#!|\\+\\+|--|\\.\\.|\\.\\.\\.|~|#|@|$|->|<-|===|!==|\\:=|\\:\\:<)",
+          "name": "invalid.illegal.rhai"
         }
       ]
     },
@@ -341,15 +323,19 @@
       "patterns": [
         {
           "match": "(?<!\\w)([A-Z][_0-9A-Z]*)(?!\\w)",
-          "name": "variable.other.constant.rhai"
+          "name": "entity.name.constant.rhai variable.other.constant.rhai"
         },
         {
           "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?=\\(|\\!\\()",
-          "name": "entity.name.function.rhai"
+          "name": "variable.function"
         },
         {
           "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)(?!\\w)",
           "name": "variable.other.readwrite.rhai"
+        },
+        {
+          "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*\\s*\\:\\:)+\\s*(?=\\w)",
+          "name": "entity.name.namespace.rhai"
         }
       ]
     }
