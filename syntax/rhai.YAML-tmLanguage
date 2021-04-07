@@ -7,6 +7,7 @@ information_for_contributors:
 patterns:
   - include: '#comment'
   - include: '#literal'
+  - include: '#operator'
 repository:
   comment:
     patterns:
@@ -36,6 +37,7 @@ repository:
         match: (//).*$\n?
         captures:
           '1': {name: punctuation.definition.comment.line.rhai}
+
   literal:
     patterns:
       - include: '#keyword'
@@ -43,8 +45,7 @@ repository:
       - include: '#number'
       - include: '#symbol'
       - include: '#variable'
-      - include: '#dict'
-      - include: '#operators'
+
   keyword:
     patterns:
       - match: \b(let|const)\b
@@ -67,20 +68,22 @@ repository:
         name: keyword.other.rhai support.function.rhai
       - match: \b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\b
         name: invalid.illegal.rhai
-  operators:
+
+  operator:
     patterns:
       - match: (==|!=|<=|>=|<|>)
         name: keyword.operator.comparison.rhai
       - match: (\+|-|\*|/|\*\*|%)
         name: keyword.operator.arithmetic.rhai
-      - match: (\||&|>>|<<|^)
+      - match: (\||&|>>|<<|\^)
         name: keyword.operator.bitwise.rhai
-      - match: (=|\+=|-=|\*=|/=|\*\*=|%=|\|=|&=|^=|>>=|<<=)
+      - match: (=|\+=|-=|\*=|/=|\*\*=|%=|\|=|&=|\^=|>>=|<<=)
         name: keyword.operator.assignment.rhai
       - match: (!)
         name: keyword.operator.infix.rhai
       - match: (\|\||&&)
         name: keyword.operator.logical.rhai
+
   number:
     patterns:
       - match: (?<!\w)(0x[0-9a-fA-F][_0-9a-fA-F]*)(?!\w)
@@ -95,6 +98,7 @@ repository:
         name: constant.numeric.decimal.rhai
       - match: ([\+-]?[0-9][_0-9]*)
         name: constant.numeric.integer.rhai
+
   string:
     patterns:
       - name: string.quoted.block.rhai
@@ -114,19 +118,6 @@ repository:
         patterns:
           - match: \\([tnr"\\\n]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})
             name: constant.character.escape.rhai
-  dict:
-    patterns:
-      - begin: (#\{)
-        beginCaptures:
-          '1': {name: variable.other.readwrite.begin.rhai}
-        end: (\})
-        endCaptures:
-          '1': {name: variable.other.readwrite.end.rhai}
-        patterns:
-          - include: '#comment'
-          - match: (?<!\w)([_a-zA-Z][_0-9a-zA-Z]*)\s*(:)\s*(?!\w)
-            name: variable.other.readwrite.rhai
-          - include: '#literal'
   
   symbol:
     patterns:

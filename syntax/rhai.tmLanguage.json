@@ -12,6 +12,9 @@
     },
     {
       "include": "#literal"
+    },
+    {
+      "include": "#operator"
     }
   ],
   "repository": {
@@ -93,12 +96,6 @@
         },
         {
           "include": "#variable"
-        },
-        {
-          "include": "#dict"
-        },
-        {
-          "include": "#operators"
         }
       ]
     },
@@ -146,7 +143,7 @@
         }
       ]
     },
-    "operators": {
+    "operator": {
       "patterns": [
         {
           "match": "(==|!=|<=|>=|<|>)",
@@ -157,11 +154,11 @@
           "name": "keyword.operator.arithmetic.rhai"
         },
         {
-          "match": "(\\||&|>>|<<|^)",
+          "match": "(\\||&|>>|<<|\\^)",
           "name": "keyword.operator.bitwise.rhai"
         },
         {
-          "match": "(=|\\+=|-=|\\*=|/=|\\*\\*=|%=|\\|=|&=|^=|>>=|<<=)",
+          "match": "(=|\\+=|-=|\\*=|/=|\\*\\*=|%=|\\|=|&=|\\^=|>>=|<<=)",
           "name": "keyword.operator.assignment.rhai"
         },
         {
@@ -236,36 +233,6 @@
             {
               "match": "\\\\([tnr\"\\\\\\n]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})",
               "name": "constant.character.escape.rhai"
-            }
-          ]
-        }
-      ]
-    },
-    "dict": {
-      "patterns": [
-        {
-          "begin": "(#\\{)",
-          "beginCaptures": {
-            "1": {
-              "name": "variable.other.readwrite.begin.rhai"
-            }
-          },
-          "end": "(\\})",
-          "endCaptures": {
-            "1": {
-              "name": "variable.other.readwrite.end.rhai"
-            }
-          },
-          "patterns": [
-            {
-              "include": "#comment"
-            },
-            {
-              "match": "(?<!\\w)([_a-zA-Z][_0-9a-zA-Z]*)\\s*(:)\\s*(?!\\w)",
-              "name": "variable.other.readwrite.rhai"
-            },
-            {
-              "include": "#literal"
             }
           ]
         }

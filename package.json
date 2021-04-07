@@ -4,7 +4,7 @@
 	"displayName": "Rhai Language Support",
 	"description": "Highlight and formatter for Rhai",
 	"publisher": "rhaiscript",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"icon": "assets/icon.png",
 	"repository": {
 		"type": "git",
