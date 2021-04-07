@@ -1,3 +1,3 @@
-import "scripts/loop";
+import "loop" as x;
 
-print("Module test!");
+print(`Module test! foo = ${x::foo}`);
