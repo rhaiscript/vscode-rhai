@@ -1,5 +1,5 @@
-# This Rhai language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Rhai is an enbedded scripting language and engine for Rust
+# This language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Repo: https://github.com/rhaiscript
 name: Rhai
 version: v0.6.0
@@ -16,25 +16,22 @@ patterns:
 repository:
   core:
     patterns:
+    - include: '#expression'
+
+  expression:
+    patterns:
     - include: '#literal-closure-labels'
 
     - include: '#literal-labels'
     - include: '#literal-keywords'
     - include: '#literal-switch'
 
-    - include: '#expression'
-    - include: '#literal-punctuation'
-
-  expression:
-    patterns:
     - include: '#support'
     - include: '#literal-function'
     - include: '#literal-closure'
 
-    - include: '#literal-number'
+    - include: '#literal-constant'
     - include: '#literal-template-string'
-    - include: '#literal-string'
-    - include: '#literal-language-constant'
     - include: '#literal-language-variable'
 
     - include: '#literal-module'
@@ -48,6 +45,14 @@ repository:
     - include: '#literal-operators'
     - include: '#literal-namespace'
     - include: '#literal-variable'
+
+    - include: '#literal-punctuation'
+
+  literal-constant:
+    patterns:
+    - include: '#literal-number'
+    - include: '#literal-string'
+    - include: '#literal-language-constant'
 
   round-brackets:
     patterns:
@@ -105,19 +110,19 @@ repository:
       begin: /\*
       end: \*/
       captures:
-        '0': {name: punctuation.definition.comment.rhai}
+        '0': {name: punctuation.definition.comment.block.rhai}
       patterns:
         - include: '#comments'
 
     - name: comment.line.documentation.rhai
       match: (///)[^/].*$\n?
       captures:
-        '1': {name: punctuation.definition.comment.rhai}
+        '1': {name: punctuation.definition.comment.documentation.rhai}
 
     - name: comment.line.double-slash.rhai
       match: (//).*$\n?
       captures:
-        '1': {name: punctuation.definition.comment.rhai}
+        '1': {name: punctuation.definition.comment.double-slash.rhai}
 
     - name: comment.line.shebang.rhai
       match: ^(#!).*$\n?
@@ -141,7 +146,7 @@ repository:
 
   literal-module:
     patterns:
-    - name: keyword.operator.module.rhai keyword.control.import.rhai
+    - name: keyword.control.import.rhai
       match: \b(import|export|as)\b
 
   literal-function:
@@ -154,8 +159,8 @@ repository:
           \s*(fn)
           \s*([_a-zA-Z]\w*)\s*
       beginCaptures:
-        '1': {name: storage.type.rhai storage.modifier.rhai}
-        '2': {name: storage.type.function.rhai keyword.declaration.function.rhai}
+        '1': {name: storage.modifier.rhai}
+        '2': {name: storage.type.function.rhai}
         '3': {name: entity.name.function.rhai}
       end: (?<=\))
       patterns:
@@ -232,7 +237,7 @@ repository:
           ([_a-zA-Z]\w*)(!)?\s*
           (\(\s*\))
       captures:
-        '1': {name: variable.function.rhai}
+        '1': {name: entity.name.function.rhai}
         '2': {name: punctuation.function-call.capture.rhai}
         '3': {name: meta.group.braces.round.function.arguments.rhai}
 
@@ -242,7 +247,7 @@ repository:
           ([_a-zA-Z]\w*)(!)?\s*
           (?=\()
       captures:
-        '1': {name: variable.function.rhai}
+        '1': {name: entity.name.function.rhai}
         '2': {name: punctuation.function-call.capture.rhai}
 
   literal-method-call:
@@ -254,7 +259,7 @@ repository:
           ([_a-zA-Z]\w*)\s*
           (\(\s*\))
       captures:
-        '1': {name: variable.function.rhai}
+        '1': {name: entity.name.function.rhai}
         '2': {name: meta.group.braces.round.function.arguments.rhai}
 
     - name: meta.function-call.method.with-arguments.rhai
@@ -264,7 +269,7 @@ repository:
           ([_a-zA-Z]\w*)\s*
           (?=\()
       captures:
-        '1': {name: variable.function.rhai}
+        '1': {name: entity.name.function.rhai}
 
   literal-language-variable:
     patterns:
@@ -310,19 +315,20 @@ repository:
       endCaptures:
         '0': {name: meta.brace.curly.rhai}
       patterns:
-      - include: '#round-brackets'
+      - include: '#expression'
       - begin: \{
         beginCaptures:
           '0': {name: meta.brace.curly.rhai}
         end: (?=})
         patterns:
-        - begin: \b(case|_)\b
+        - begin: (?<([\{,\}]|\(\)))
           beginCaptures:
-            '1': {name: keyword.control.switch.rhai}
+            '1': {name: keyword.control.switch.case.rhai}
           end: (?==>)
           patterns:
-          - include: '#expression'
-          - match: _
+          - include: '#literal-constant'
+          - name: name: keyword.control.switch.default.rhai
+            match: \_
         - include: $self
 
   literal-operators:
@@ -336,7 +342,7 @@ repository:
     - name: keyword.operator.assignment.rhai
       match: >-
         (?x)
-          =(?!=)  # assignment      right-to-left   both
+          =(?![=>]) # assignment      right-to-left   both
     - name: keyword.operator.assignment.augmented.rhai
       match: >-
         (?x)
@@ -365,7 +371,7 @@ repository:
           <=   | # relational      left-to-right   both
           >=   | # relational      left-to-right   both
           <    | # relational      left-to-right   both
-          >      # relational      left-to-right   both
+          (?<!=)> # relational      left-to-right   both
     - name: keyword.operator.comparison.rhai
       match: >-
         (?x)
@@ -377,7 +383,7 @@ repository:
           /    | # division        left-to-right   both
           %    | # modulus         left-to-right   both
           \*\* | # power           left-to-right   both
-          (?<!\*)\* | # multiplication  left-to-right   both
+          \*(?!\*) | # multiplication  left-to-right   both
           \+   | # addition        left-to-right   both
           -      # subtraction     left-to-right   both
     - name: keyword.operator.accessor.rhai punctuation.accessor.rhai
@@ -388,14 +394,14 @@ repository:
     - begin: >-
         (?x)
           (?<!\?)(?<!\?\s)
-            (?=((")((?:[^"]|\\")*)("))\s*:)
+            (?=((")((?:[^\:"]|\\")*)("))\s*:)
       end: ':'
       endCaptures:
         '0': {name: punctuation.separator.key-value.rhai}
       patterns:
       - include: '#literal-string'
     - name: constant.other.object.key.rhai
-      match: (?<!\.|\?|\?\s)([_a-zA-Z]\w*)\s*(:)
+      match: (?<!\.|\?|\?\s)([_a-zA-Z]\w*)\s*(:)(?!\:)
       captures:
         '1': {name: string.unquoted.label.rhai}
         '2': {name: punctuation.separator.key-value.rhai}
@@ -426,7 +432,7 @@ repository:
 
   literal-template-string:
     patterns:
-    - name: string.template-string.rhai
+    - name: string.interpolated.rhai
       begin: '`'
       beginCaptures:
         '0': {name: punctuation.definition.string.begin.rhai}
@@ -435,14 +441,13 @@ repository:
         '0': {name: punctuation.definition.string.end.rhai}
       patterns:
       - include: '#string-content'
-      - name: entity.template-string.element.rhai meta.interpolation.rhai
+      - name: meta.interpolation.rhai
         begin: \${
         beginCaptures:
           '0': {name: punctuation.section.interpolation.begin.rhai}
         end: '}'
         endCaptures:
           '0': {name: punctuation.section.interpolation.end.rhai}
-        clear_scope: string.*
         patterns:
         - include: '#expression'
 
@@ -477,13 +482,18 @@ repository:
 
   literal-namespace:
     patterns:
-    - name: meta.path
-      match: ((?:([_a-zA-Z]\w*)\s*(\:\:)\s*)+)([_a-zA-Z]\w*)
+    # e.g. ns::var
+    - name: meta.path.rhai
+      match: ([_a-zA-Z]\w*)\s*(\:\:)
       captures:
-        '1': {name: meta.namespace.rhai}
-        '2': {name: entity.name.namespace.rhai}
-        '3': {name: punctuation.separator.namespace.rhai}
-        '4': {name: variable.other.readwrite.rhai}
+        '1': {name: entity.name.namespace.rhai}
+        '2': {name: punctuation.separator.namespace.rhai}
+
+    # e.g. ns::var
+    - match: (?<=\:\:)(\s*([_a-zA-Z]\w*))\s*(?!\:\:)
+      captures:
+        '1': {name: meta.path.rhai}
+        '2': {name: variable.other.constant.rhai}
   
   literal-variable:
     patterns:
@@ -492,16 +502,14 @@ repository:
       match: '[A-Z][_\dA-Z]*\b'
 
     # e.g. obj.property
-    - name: variable.other.object.rhai
-      match: (?<!\.)[_a-zA-Z]\w*\s*(?=[\[\.])
+    - match: (?<!\.)([_a-zA-Z]\w*)\s*(?=\.)
       captures:
         '1': {name: variable.other.object.rhai}
 
     # e.g. obj.property
-    - name: meta.property.object.rhai
-      match: (?<=\.)\s*[_a-zA-Z]\w*
+    - match: (?<=\.)\s*([_a-zA-Z]\w*)
       captures:
-        '2': {name: variable.other.property.rhai}
+        '1': {name: variable.other.property.rhai entity.name.property.rhai}
 
     - name: variable.other.readwrite.rhai
       match: '[_a-zA-Z]\w*'
@@ -510,5 +518,5 @@ repository:
     # built-ins
     - name: support.function.rhai
       match: \b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\b
-    - name: invalid.illegal.rhai
+    - name: invalid.illegal.keyword.rhai
       match: \b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\b

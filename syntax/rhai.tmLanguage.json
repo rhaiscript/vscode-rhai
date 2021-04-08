@@ -19,6 +19,13 @@
     "core": {
       "patterns": [
         {
+          "include": "#expression"
+        }
+      ]
+    },
+    "expression": {
+      "patterns": [
+        {
           "include": "#literal-closure-labels"
         },
         {
@@ -31,16 +38,6 @@
           "include": "#literal-switch"
         },
         {
-          "include": "#expression"
-        },
-        {
-          "include": "#literal-punctuation"
-        }
-      ]
-    },
-    "expression": {
-      "patterns": [
-        {
           "include": "#support"
         },
         {
@@ -50,16 +47,10 @@
           "include": "#literal-closure"
         },
         {
-          "include": "#literal-number"
+          "include": "#literal-constant"
         },
         {
           "include": "#literal-template-string"
-        },
-        {
-          "include": "#literal-string"
-        },
-        {
-          "include": "#literal-language-constant"
         },
         {
           "include": "#literal-language-variable"
@@ -87,6 +78,22 @@
         },
         {
           "include": "#literal-variable"
+        },
+        {
+          "include": "#literal-punctuation"
+        }
+      ]
+    },
+    "literal-constant": {
+      "patterns": [
+        {
+          "include": "#literal-number"
+        },
+        {
+          "include": "#literal-string"
+        },
+        {
+          "include": "#literal-language-constant"
         }
       ]
     },
@@ -198,7 +205,7 @@
           "end": "\\*/",
           "captures": {
             "0": {
-              "name": "punctuation.definition.comment.rhai"
+              "name": "punctuation.definition.comment.block.rhai"
             }
           },
           "patterns": [
@@ -212,7 +219,7 @@
           "match": "(///)[^/].*$\\n?",
           "captures": {
             "1": {
-              "name": "punctuation.definition.comment.rhai"
+              "name": "punctuation.definition.comment.documentation.rhai"
             }
           }
         },
@@ -221,7 +228,7 @@
           "match": "(//).*$\\n?",
           "captures": {
             "1": {
-              "name": "punctuation.definition.comment.rhai"
+              "name": "punctuation.definition.comment.double-slash.rhai"
             }
           }
         },
@@ -270,7 +277,7 @@
     "literal-module": {
       "patterns": [
         {
-          "name": "keyword.operator.module.rhai keyword.control.import.rhai",
+          "name": "keyword.control.import.rhai",
           "match": "\\b(import|export|as)\\b"
         }
       ]
@@ -282,10 +289,10 @@
           "begin": "(?x)  (?:\\b(private)\\s+)?\n  \\s*(fn)\n  \\s*([_a-zA-Z]\\w*)\\s*",
           "beginCaptures": {
             "1": {
-              "name": "storage.type.rhai storage.modifier.rhai"
+              "name": "storage.modifier.rhai"
             },
             "2": {
-              "name": "storage.type.function.rhai keyword.declaration.function.rhai"
+              "name": "storage.type.function.rhai"
             },
             "3": {
               "name": "entity.name.function.rhai"
@@ -395,7 +402,7 @@
           "match": "(?x)  ([_a-zA-Z]\\w*)(!)?\\s*\n  (\\(\\s*\\))",
           "captures": {
             "1": {
-              "name": "variable.function.rhai"
+              "name": "entity.name.function.rhai"
             },
             "2": {
               "name": "punctuation.function-call.capture.rhai"
@@ -410,7 +417,7 @@
           "match": "(?x)  ([_a-zA-Z]\\w*)(!)?\\s*\n  (?=\\()",
           "captures": {
             "1": {
-              "name": "variable.function.rhai"
+              "name": "entity.name.function.rhai"
             },
             "2": {
               "name": "punctuation.function-call.capture.rhai"
@@ -426,7 +433,7 @@
           "match": "(?x)  (?<=\\.)\n  ([_a-zA-Z]\\w*)\\s*\n  (\\(\\s*\\))",
           "captures": {
             "1": {
-              "name": "variable.function.rhai"
+              "name": "entity.name.function.rhai"
             },
             "2": {
               "name": "meta.group.braces.round.function.arguments.rhai"
@@ -438,7 +445,7 @@
           "match": "(?x)  (?<=\\.)\n  ([_a-zA-Z]\\w*)\\s*\n  (?=\\()",
           "captures": {
             "1": {
-              "name": "variable.function.rhai"
+              "name": "entity.name.function.rhai"
             }
           }
         }
@@ -513,7 +520,7 @@
           },
           "patterns": [
             {
-              "include": "#round-brackets"
+              "include": "#expression"
             },
             {
               "begin": "\\{",
@@ -525,19 +532,20 @@
               "end": "(?=})",
               "patterns": [
                 {
-                  "begin": "\\b(case|_)\\b",
+                  "begin": "(?<([\\{,\\}]|\\(\\)))",
                   "beginCaptures": {
                     "1": {
-                      "name": "keyword.control.switch.rhai"
+                      "name": "keyword.control.switch.case.rhai"
                     }
                   },
                   "end": "(?==>)",
                   "patterns": [
                     {
-                      "include": "#expression"
+                      "include": "#literal-constant"
                     },
                     {
-                      "match": "_"
+                      "name": "name: keyword.control.switch.default.rhai",
+                      "match": "\\_"
                     }
                   ]
                 },
@@ -558,7 +566,7 @@
         },
         {
           "name": "keyword.operator.assignment.rhai",
-          "match": "(?x)  =(?!=)  # assignment      right-to-left   both"
+          "match": "(?x)  =(?![=>]) # assignment      right-to-left   both"
         },
         {
           "name": "keyword.operator.assignment.augmented.rhai",
@@ -570,7 +578,7 @@
         },
         {
           "name": "keyword.operator.relational.rhai",
-          "match": "(?x)  <=   | # relational      left-to-right   both\n  >=   | # relational      left-to-right   both\n  <    | # relational      left-to-right   both\n  >      # relational      left-to-right   both"
+          "match": "(?x)  <=   | # relational      left-to-right   both\n  >=   | # relational      left-to-right   both\n  <    | # relational      left-to-right   both\n  (?<!=)> # relational      left-to-right   both"
         },
         {
           "name": "keyword.operator.comparison.rhai",
@@ -578,7 +586,7 @@
         },
         {
           "name": "keyword.operator.arithmetic.rhai",
-          "match": "(?x)  /    | # division        left-to-right   both\n  %    | # modulus         left-to-right   both\n  \\*\\* | # power           left-to-right   both\n  (?<!\\*)\\* | # multiplication  left-to-right   both\n  \\+   | # addition        left-to-right   both\n  -      # subtraction     left-to-right   both"
+          "match": "(?x)  /    | # division        left-to-right   both\n  %    | # modulus         left-to-right   both\n  \\*\\* | # power           left-to-right   both\n  \\*(?!\\*) | # multiplication  left-to-right   both\n  \\+   | # addition        left-to-right   both\n  -      # subtraction     left-to-right   both"
         },
         {
           "name": "keyword.operator.accessor.rhai punctuation.accessor.rhai",
@@ -589,7 +597,7 @@
     "literal-labels": {
       "patterns": [
         {
-          "begin": "(?x)  (?<!\\?)(?<!\\?\\s)\n    (?=((\")((?:[^\"]|\\\\\")*)(\"))\\s*:)",
+          "begin": "(?x)  (?<!\\?)(?<!\\?\\s)\n    (?=((\")((?:[^\\:\"]|\\\\\")*)(\"))\\s*:)",
           "end": ":",
           "endCaptures": {
             "0": {
@@ -604,7 +612,7 @@
         },
         {
           "name": "constant.other.object.key.rhai",
-          "match": "(?<!\\.|\\?|\\?\\s)([_a-zA-Z]\\w*)\\s*(:)",
+          "match": "(?<!\\.|\\?|\\?\\s)([_a-zA-Z]\\w*)\\s*(:)(?!\\:)",
           "captures": {
             "1": {
               "name": "string.unquoted.label.rhai"
@@ -639,7 +647,7 @@
     "literal-template-string": {
       "patterns": [
         {
-          "name": "string.template-string.rhai",
+          "name": "string.interpolated.rhai",
           "begin": "`",
           "beginCaptures": {
             "0": {
@@ -657,7 +665,7 @@
               "include": "#string-content"
             },
             {
-              "name": "entity.template-string.element.rhai meta.interpolation.rhai",
+              "name": "meta.interpolation.rhai",
               "begin": "\\${",
               "beginCaptures": {
                 "0": {
@@ -670,7 +678,6 @@
                   "name": "punctuation.section.interpolation.end.rhai"
                 }
               },
-              "clear_scope": "string.*",
               "patterns": [
                 {
                   "include": "#expression"
@@ -737,20 +744,25 @@
     "literal-namespace": {
       "patterns": [
         {
-          "name": "meta.path",
-          "match": "((?:([_a-zA-Z]\\w*)\\s*(\\:\\:)\\s*)+)([_a-zA-Z]\\w*)",
+          "name": "meta.path.rhai",
+          "match": "([_a-zA-Z]\\w*)\\s*(\\:\\:)",
           "captures": {
             "1": {
-              "name": "meta.namespace.rhai"
-            },
-            "2": {
               "name": "entity.name.namespace.rhai"
             },
-            "3": {
+            "2": {
               "name": "punctuation.separator.namespace.rhai"
+            }
+          }
+        },
+        {
+          "match": "(?<=\\:\\:)(\\s*([_a-zA-Z]\\w*))\\s*(?!\\:\\:)",
+          "captures": {
+            "1": {
+              "name": "meta.path.rhai"
             },
-            "4": {
-              "name": "variable.other.readwrite.rhai"
+            "2": {
+              "name": "variable.other.constant.rhai"
             }
           }
         }
@@ -763,8 +775,7 @@
           "match": "[A-Z][_\\dA-Z]*\\b"
         },
         {
-          "name": "variable.other.object.rhai",
-          "match": "(?<!\\.)[_a-zA-Z]\\w*\\s*(?=[\\[\\.])",
+          "match": "(?<!\\.)([_a-zA-Z]\\w*)\\s*(?=\\.)",
           "captures": {
             "1": {
               "name": "variable.other.object.rhai"
@@ -772,11 +783,10 @@
           }
         },
         {
-          "name": "meta.property.object.rhai",
-          "match": "(?<=\\.)\\s*[_a-zA-Z]\\w*",
+          "match": "(?<=\\.)\\s*([_a-zA-Z]\\w*)",
           "captures": {
-            "2": {
-              "name": "variable.other.property.rhai"
+            "1": {
+              "name": "variable.other.property.rhai entity.name.property.rhai"
             }
           }
         },
@@ -792,7 +802,7 @@
         "match": "\\b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\\b"
       },
       {
-        "name": "invalid.illegal.rhai",
+        "name": "invalid.illegal.keyword.rhai",
         "match": "\\b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\\b"
       }
     ]
