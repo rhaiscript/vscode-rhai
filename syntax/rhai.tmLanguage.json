@@ -1,6 +1,6 @@
 {
   "name": "Rhai",
-  "version": "v0.6.0",
+  "version": "v0.6.1",
   "fileTypes": [
     "rhai"
   ],
@@ -33,9 +33,6 @@
         },
         {
           "include": "#literal-keywords"
-        },
-        {
-          "include": "#literal-switch"
         },
         {
           "include": "#support"
@@ -490,7 +487,7 @@
         },
         {
           "name": "keyword.control.conditional.rhai",
-          "match": "\\b(if|else)\\b"
+          "match": "\\b(if|else|switch)\\b"
         },
         {
           "name": "keyword.control.trycatch.rhai",
@@ -499,62 +496,6 @@
         {
           "name": "keyword.control.loop.rhai",
           "match": "\\b(for|in|loop|do|while|until|break|continue)\\b"
-        }
-      ]
-    },
-    "literal-switch": {
-      "patterns": [
-        {
-          "name": "meta.switch.rhai",
-          "begin": "\\b(switch)\\b",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.control.switch.rhai"
-            }
-          },
-          "end": "\\}",
-          "endCaptures": {
-            "0": {
-              "name": "meta.brace.curly.rhai"
-            }
-          },
-          "patterns": [
-            {
-              "include": "#expression"
-            },
-            {
-              "begin": "\\{",
-              "beginCaptures": {
-                "0": {
-                  "name": "meta.brace.curly.rhai"
-                }
-              },
-              "end": "(?=})",
-              "patterns": [
-                {
-                  "begin": "(?<([\\{,\\}]|\\(\\)))",
-                  "beginCaptures": {
-                    "1": {
-                      "name": "keyword.control.switch.case.rhai"
-                    }
-                  },
-                  "end": "(?==>)",
-                  "patterns": [
-                    {
-                      "include": "#literal-constant"
-                    },
-                    {
-                      "name": "name: keyword.control.switch.default.rhai",
-                      "match": "\\_"
-                    }
-                  ]
-                },
-                {
-                  "include": "$self"
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -591,6 +532,10 @@
         {
           "name": "keyword.operator.accessor.rhai punctuation.accessor.rhai",
           "match": "\\."
+        },
+        {
+          "name": "punctuation.separator.switch.case.rhai",
+          "match": "=>"
         }
       ]
     },
@@ -796,15 +741,17 @@
         }
       ]
     },
-    "support": [
-      {
-        "name": "support.function.rhai",
-        "match": "\\b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\\b"
-      },
-      {
-        "name": "invalid.illegal.keyword.rhai",
-        "match": "\\b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\\b"
-      }
-    ]
+    "support": {
+      "patterns": [
+        {
+          "name": "support.function.rhai",
+          "match": "\\b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\\b"
+        },
+        {
+          "name": "invalid.illegal.keyword.rhai",
+          "match": "\\b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\\b"
+        }
+      ]
+    }
   }
 }

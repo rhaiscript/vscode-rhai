@@ -2,7 +2,7 @@
 # This language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Repo: https://github.com/rhaiscript
 name: Rhai
-version: v0.6.0
+version: v0.6.1
 fileTypes: [rhai]
 uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
 scopeName: source.rhai
@@ -24,7 +24,6 @@ repository:
 
     - include: '#literal-labels'
     - include: '#literal-keywords'
-    - include: '#literal-switch'
 
     - include: '#support'
     - include: '#literal-function'
@@ -297,39 +296,13 @@ repository:
       match: \b(return)\b
 
     - name: keyword.control.conditional.rhai
-      match: \b(if|else)\b
+      match: \b(if|else|switch)\b
 
     - name: keyword.control.trycatch.rhai
       match: \b(throw|try|catch)\b
 
     - name: keyword.control.loop.rhai
       match: \b(for|in|loop|do|while|until|break|continue)\b
-
-  literal-switch:
-    patterns:
-    - name: meta.switch.rhai
-      begin: \b(switch)\b
-      beginCaptures:
-        '1': {name: keyword.control.switch.rhai}
-      end: \}
-      endCaptures:
-        '0': {name: meta.brace.curly.rhai}
-      patterns:
-      - include: '#expression'
-      - begin: \{
-        beginCaptures:
-          '0': {name: meta.brace.curly.rhai}
-        end: (?=})
-        patterns:
-        - begin: (?<([\{,\}]|\(\)))
-          beginCaptures:
-            '1': {name: keyword.control.switch.case.rhai}
-          end: (?==>)
-          patterns:
-          - include: '#literal-constant'
-          - name: name: keyword.control.switch.default.rhai
-            match: \_
-        - include: $self
 
   literal-operators:
     patterns:
@@ -388,6 +361,8 @@ repository:
           -      # subtraction     left-to-right   both
     - name: keyword.operator.accessor.rhai punctuation.accessor.rhai
       match: \.
+    - name: punctuation.separator.switch.case.rhai
+      match: =>
 
   literal-labels:
     patterns:
@@ -515,6 +490,7 @@ repository:
       match: '[_a-zA-Z]\w*'
 
   support:
+    patterns:
     # built-ins
     - name: support.function.rhai
       match: \b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\b

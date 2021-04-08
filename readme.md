@@ -20,8 +20,8 @@ Todo list
 - [ ] Language server
 
 
-How to build
-------------
+How to build extension from source
+---------------------------------
 
 ### Prerequisites
 
