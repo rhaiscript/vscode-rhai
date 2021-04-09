@@ -1,6 +1,10 @@
 Rhai Language Support for Visual Studio Code
 ===========================================
 
+[![License](https://img.shields.io/github/license/rhaiscript/vscode-rhai)](https://github.com/rhaiscript/vscode-rhai/blob/master/LICENSE.md)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/rhaiscript.vscode-rhai)](https://img.shields.io/visual-studio-marketplace/i/rhaiscript.vscode-rhai)
+[![Latest release](https://img.shields.io/github/release/rhaiscript/vscode-rhai.svg)](https://github.com/rhaiscript/vscode-rhai/releases/latest)
+
 [![Rhai logo](https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.png)](https://rhai.rs)
 
 [Rhai](https://rhai.rs) is an embedded scripting language and evaluation engine for Rust that gives
@@ -13,50 +17,22 @@ Features
 - [x] Syntax highlighting
 
 
-Todo list
+Todo List
 ---------
 
 - [ ] Auto formatter
 - [ ] Language server
 
 
-How to build extension from source
----------------------------------
+How to Install
+--------------
 
-### Prerequisites
+- Search for `Rhai Language Support` in Visual Studio Code.
 
-- Install [Node.js](https://nodejs.org)
+- Download directly from the [Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/i/rhaiscript.vscode-rhai).
 
-- Install [TypeScript](https://www.typescriptlang.org)
 
-```sh
-npm install -g typescript
-```
+Screenshot
+----------
 
-- Install [VSCE](https://github.com/Microsoft/vscode-vsce)
-
-```sh
-npm install -g vsce
-```
-
-### Fetch Node packages
-
-```sh
-npm install
-```
-
-### Compile with TypeScript
-
-```sh
-tsc
-```
-
-Compiled files are in the `dist` directory.
-
-### Build VSIX package
-
-```sh
-vsce package
-```
-
-Compiled package is `vscode-rhai-`_version_`.vsix` within the main directory.
+![Sample](https://github.com/rhaiscript/vscode-rhai/raw/master/assets/sample.png)

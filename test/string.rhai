@@ -32,6 +32,8 @@ made using multi-line literal
       string syntax.
 `;
 
+print(s);
+
 // Interpolation
 let s = `This is interpolation ${
             let x = `within ${let y = "yet another level \
