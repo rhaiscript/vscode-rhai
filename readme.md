@@ -35,4 +35,4 @@ How to Install
 Screenshot
 ----------
 
-![Sample](https://github.com/rhaiscript/vscode-rhai/raw/master/assets/sample.png)
+![Sample](assets/sample.png)

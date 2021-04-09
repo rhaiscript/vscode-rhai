@@ -2,10 +2,14 @@
 	"name": "vscode-rhai",
 	"private": true,
 	"displayName": "Rhai Language Support",
-	"description": "Syntax highlighting for Rhai",
+	"description": "Syntax highlighting for Rhai scripts",
 	"publisher": "rhaiscript",
 	"version": "0.6.1",
 	"icon": "assets/icon.png",
+	"homepage": "https://rhai.rs",
+	"bugs": {
+		"url": "https://github.com/rhaiscript/vscode-rhai/issues"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/rhaiscript/vscode-rhai.git"
@@ -97,10 +101,5 @@
 		"@types/vscode": "^1.30.0",
 		"tslint": "^6.0.0",
 		"typescript": "^3.8.2"
-	},
-	"__metadata": {
-		"id": "1e76f176-ee1c-4331-a781-eb21c0da77cf",
-		"publisherDisplayName": "Aster",
-		"publisherId": "3406b78c-f287-4619-8d82-7c97998693e3"
 	}
 }
