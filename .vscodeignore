@@ -3,8 +3,15 @@ source/**/*
 images/**/*
 test/**/*
 
+.gitignore
 
 *.tgz
 **/*.ai
 yarn*
 
+.vscode
+**/*.ts
+BUILD.md
+ts*.json
+
+*.vsix
