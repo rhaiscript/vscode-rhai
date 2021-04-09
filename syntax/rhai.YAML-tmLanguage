@@ -56,10 +56,10 @@ repository:
   round-brackets:
     patterns:
     - name: meta.group.braces.round
-      begin: \(
+      begin: \((?!\*)
       beginCaptures:
         '0': {name: meta.brace.round.rhai}
-      end: \)
+      end: (?<!\*)\)
       endCaptures:
         '0': {name: meta.brace.round.rhai}
       patterns:
@@ -141,7 +141,15 @@ repository:
         match: '[_a-zA-Z]\w*'
       - name: punctuation.separator.parameter.function.rhai
         match: \,
-      - include: '#comments'
+      - include: '#parameters-list'
+
+  parameters-list:
+    patterns:
+    - name: variable.parameter.function.rhai
+      match: '[_a-zA-Z]\w*'
+    - name: punctuation.separator.parameter.function.rhai
+      match: \,
+    - include: '#comments'
 
   literal-module:
     patterns:
@@ -163,70 +171,64 @@ repository:
         '3': {name: entity.name.function.rhai}
       end: (?<=\))
       patterns:
-      - include: '#function-declaration-parameters'
+      - include: '#parameters-list'
 
   literal-closure:
     patterns:
     # e.g. |args| { }
     - name: meta.function.closure.rhai
-      begin: >-
-        (?x)
-          (?=\|[^|]*\|\s+)
-      end: (?<=\|)\s+
+      begin: (\|)
+      beginCaptures:
+        '1': {name: punctuation.definition.parameters.closure.begin.rhai}
+      end: (\|)
       endCaptures:
-        '1': {name: storage.type.function.closure.rhai}
+        '1': {name: punctuation.definition.parameters.closure.end.rhai}
       patterns:
-      - include: '#function-declaration-parameters'
+      - include: '#parameters-list'
 
     # e.g. play = |args| { }
     - name: meta.function.closure.rhai
-      begin: >-
-        (?x)
-          (\b[_a-zA-Z]\w*)
-          \s*=
-          \s*(?=\|[^|]*\|\s+)
+      begin: (\b[_a-zA-Z]\w*)\s*(=)\s*(\|)
       beginCaptures:
         '1': {name: entity.name.function.closure.rhai}
-      end: (?<=\|)\s+
+        '2': {name: keyword.operator.assignment.rhai}
+        '3': {name: punctuation.definition.parameters.closure.begin.rhai}
+      end: (\|)
+      endCaptures:
+        '1': {name: punctuation.definition.parameters.closure.end.rhai}
       patterns:
-      - include: '#function-declaration-parameters'
+      - include: '#parameters-list'
 
   literal-closure-labels:
     patterns:
     # e.g. play: |args| { }
     - name: meta.function.closure.rhai
-      begin: >-
-        (?x)
-          \b([_a-zA-Z]\w*)
-          \s*(:)
-          \s*(?=\|[^|]*\|\s+)
+      begin: (\b[_a-zA-Z]\w*)\s*(\:)\s*(\|)
       beginCaptures:
-        '1': {name: entity.name.function.rhai}
+        '1': {name: string.unquoted.label.rhai entity.name.function.method.rhai}
         '2': {name: punctuation.separator.key-value.rhai}
-      end: (?<=\|)\s+
+        '3': {name: punctuation.definition.parameters.closure.begin.rhai}
+      end: (\|)
+      endCaptures:
+        '1': {name: punctuation.definition.parameters.closure.end.rhai}
       patterns:
-      - include: '#function-declaration-parameters'
+      - include: '#parameters-list'
 
     # e.g. "play": |args| { }
     - name: meta.function.closure.rhai
-      begin: >-
-        (?x)
-          (?:
-            ((")((?:[^"]|\\")*)("))
-          )
-          \s*(:)
-          \s*(?=\|[^|]*\|\s+)
+      begin: ((\")((?:[^"]|\\")*)(\"))\s*(:)\s*(\|)
       beginCaptures:
         '1': {name: string.quoted.double.rhai}
         '2': {name: punctuation.definition.string.begin.rhai}
-        '3': {name: entity.name.function.rhai}
+        '3': {name: entity.name.function.method.rhai}
         '4': {name: punctuation.definition.string.end.rhai}
         '5': {name: punctuation.separator.key-value.rhai}
-      end: (?<=\|)\s+
+        '6': {name: punctuation.definition.parameters.closure.begin.rhai}
+      end: (\|)
       endCaptures:
-        '1': {name: storage.type.function.arrow.rhai}
+        '1': {name: punctuation.definition.parameters.closure.end.rhai}
       patterns:
-      - include: '#function-declaration-parameters'
+      - include: '#parameters-list'
 
   literal-function-call:
     patterns:
@@ -255,7 +257,7 @@ repository:
       match: >-
         (?x)
           (?<=\.)
-          ([_a-zA-Z]\w*)\s*
+          \s*([_a-zA-Z]\w*)\s*
           (\(\s*\))
       captures:
         '1': {name: entity.name.function.rhai}
@@ -265,7 +267,7 @@ repository:
       match: >-
         (?x)
           (?<=\.)
-          ([_a-zA-Z]\w*)\s*
+          \s*([_a-zA-Z]\w*)\s*
           (?=\()
       captures:
         '1': {name: entity.name.function.rhai}
@@ -341,28 +343,30 @@ repository:
     - name: keyword.operator.relational.rhai
       match: >-
         (?x)
-          <=   | # relational      left-to-right   both
-          >=   | # relational      left-to-right   both
-          <    | # relational      left-to-right   both
-          (?<!=)> # relational      left-to-right   both
+          <=     | # relational      left-to-right   both
+          >=     | # relational      left-to-right   both
+          <(?!-) | # relational      left-to-right   both
+          (?<!-)>  # relational      left-to-right   both
     - name: keyword.operator.comparison.rhai
       match: >-
         (?x)
-          ==   | # equality        left-to-right   both
-          !=     # equality        left-to-right   both
+          ==(?!=) | # equality        left-to-right   both
+          !=(?!=)   # equality        left-to-right   both
     - name: keyword.operator.arithmetic.rhai
       match: >-
         (?x)
-          /    | # division        left-to-right   both
-          %    | # modulus         left-to-right   both
-          \*\* | # power           left-to-right   both
-          \*(?!\*) | # multiplication  left-to-right   both
-          \+   | # addition        left-to-right   both
-          -      # subtraction     left-to-right   both
+          /         | # division        left-to-right   both
+          %         | # modulus         left-to-right   both
+          \*\*      | # power           left-to-right   both
+          \*(?!\))  | # multiplication  left-to-right   both
+          \+(?!\+)  | # addition        left-to-right   both
+          -(?![>-])   # subtraction     left-to-right   both
     - name: keyword.operator.accessor.rhai punctuation.accessor.rhai
-      match: \.
+      match: \.(?!\.)
     - name: punctuation.separator.switch.case.rhai
       match: =>
+    - name: invalid.illegal.operator.rhai
+      match: (\(\*|\*\)|\+\+|--|\.\.+|~|#(?!{)|@|\$(?!{)|->|<-|===|!==|\:=|\:\:<)
 
   literal-labels:
     patterns:
@@ -435,31 +439,32 @@ repository:
           name: constant.character.escape.rhai
 
     - name: string.quoted.double.rhai
-      begin: '"'
+      begin: (")
       beginCaptures:
-        '0': {name: punctuation.definition.string.begin.rhai}
-      end: (")|(\n)
+        '1': {name: punctuation.definition.string.begin.rhai}
+      end: (")
       endCaptures:
         '1': {name: punctuation.definition.string.end.rhai}
-        '2': {name: invalid.illegal.newline.rhai}
       patterns:
       - include: '#string-content'
+      - name: invalid.illegal.newline.rhai
+        match: (?<!\\)\n
       - name: constant.character.escape.newline.rhai punctuation.separator.continuation
         match: \\\n
 
   string-content:
     patterns:
     - name: constant.character.escape.rhai
-      match: \\(x[\da-fA-F]{2}|u[\da-fA-F]{4}|U[\da-fA-F]{8}|t|r|n)
+      match: \\(x[\da-fA-F]{2}|u[\da-fA-F]{4}|U[\da-fA-F]{8}|t|r|n|\\)
 
     - name: invalid.illegal.escape.rhai
-      match: \\[^xuUtrn]
+      match: \\[^xuUtrn\\\n]
 
   literal-namespace:
     patterns:
     # e.g. ns::var
     - name: meta.path.rhai
-      match: ([_a-zA-Z]\w*)\s*(\:\:)
+      match: ([_a-zA-Z]\w*)\s*(\:\:)(?!<)
       captures:
         '1': {name: entity.name.namespace.rhai}
         '2': {name: punctuation.separator.namespace.rhai}
@@ -477,7 +482,7 @@ repository:
       match: '[A-Z][_\dA-Z]*\b'
 
     # e.g. obj.property
-    - match: (?<!\.)([_a-zA-Z]\w*)\s*(?=\.)
+    - match: (?<!\.)\s*([_a-zA-Z]\w*)\s*(?=\.)
       captures:
         '1': {name: variable.other.object.rhai}
 
