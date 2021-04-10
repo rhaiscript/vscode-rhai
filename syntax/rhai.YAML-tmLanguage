@@ -2,7 +2,7 @@
 # This language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Repo: https://github.com/rhaiscript
 name: Rhai
-version: v0.7.0
+version: v0.6.2
 fileTypes: [rhai]
 uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
 scopeName: source.rhai
@@ -390,15 +390,13 @@ repository:
     - name: constant.numeric.rhai
       match: >-
         (?xi)
-          (?:\B[-+])?
           (?:
-            \b0b[0-1][_0-1]*|           # binary
-            \b0o[0-7][_0-7]*|           # octal
-            \b0x[0-9a-f][_0-9a-f]*|     # hex
-            (
-              \B\.[0-9][_0-9]*|         # e.g. .999
-              \b[0-9][_0-9]*(\.[0-9]?[_0-9]*)? # e.g. 999.999, 999. or 999
-            )(e[-+]?[0-9][_0-9]*)?      # e.g. e+123
+            \b0b[0-1][_0-1]*|                         # binary
+            \b0o[0-7][_0-7]*|                         # octal
+            \b0x[\da-f][_\da-f]*|                     # hex
+            (\B[+\-])?\b\d[_\d]*\.\d[_\d]*(e[+\-]?\d[_\d]*)?| # e.g. 999.999, 999.99e+123
+            (\B[+\-])?\b\d[_\d]*\.\B|                 # e.g. 999.
+            (\B[+\-])?\b\d[_\d]*(e[+\-]?\d[_\d]*)?    # e.g. 999, 999e+123
           )
 
   literal-punctuation:
