@@ -2,7 +2,7 @@
 # This language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Repo: https://github.com/rhaiscript
 name: Rhai
-version: v0.6.2
+version: v0.6.3
 fileTypes: [rhai]
 uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
 scopeName: source.rhai

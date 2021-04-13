@@ -4,7 +4,7 @@
 	"displayName": "Rhai Language Support",
 	"description": "Syntax highlighting for Rhai scripts",
 	"publisher": "rhaiscript",
-	"version": "0.6.2",
+	"version": "0.6.3",
 	"icon": "assets/icon.png",
 	"homepage": "https://rhai.rs",
 	"bugs": {
