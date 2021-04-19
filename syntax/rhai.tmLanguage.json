@@ -507,12 +507,22 @@
         {
           "name": "constant.language.boolean.false.rhai",
           "match": "\\bfalse\\b"
-        },
+        }
+      ]
+    },
+    "literal-language-namespace": {
+      "patterns": [
         {
-          "match": "(?<!\\:\\:)\\s*(global)\\s*(?=\\:\\:)",
+          "match": "(?<!\\:\\:)\\s*((global)\\s*(\\:\\:))(?!<)",
           "captures": {
             "1": {
+              "name": "meta.path.rhai"
+            },
+            "2": {
               "name": "constant.language.namespace.global.rhai entity.name.namespace.rhai"
+            },
+            "3": {
+              "name": "punctuation.separator.namespace.rhai"
             }
           }
         }
@@ -743,6 +753,9 @@
     },
     "literal-namespace": {
       "patterns": [
+        {
+          "include": "#literal-language-namespace"
+        },
         {
           "name": "meta.path.rhai",
           "match": "([_a-zA-Z]\\w*)\\s*(\\:\\:)(?!<)",

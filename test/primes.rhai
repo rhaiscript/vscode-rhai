@@ -21,7 +21,6 @@ for p in range(2, MAX_NUMBER_TO_CHECK) {
 
     for i in range(2 * p, MAX_NUMBER_TO_CHECK, p) {
         prime_mask[i] = false;
-        i += p;
     }
 }
 

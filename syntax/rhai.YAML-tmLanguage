@@ -285,9 +285,13 @@ repository:
     - name: constant.language.boolean.false.rhai
       match: \bfalse\b
 
-    - match: (?<!\:\:)\s*(global)\s*(?=\:\:)
+  literal-language-namespace:
+    patterns:
+    - match: (?<!\:\:)\s*((global)\s*(\:\:))(?!<)
       captures:
-        '1': {name: constant.language.namespace.global.rhai entity.name.namespace.rhai}
+        '1': {name: meta.path.rhai }
+        '2': {name: constant.language.namespace.global.rhai entity.name.namespace.rhai }
+        '3': {name: punctuation.separator.namespace.rhai }
 
   literal-keyword-storage:
     patterns:
@@ -464,6 +468,8 @@ repository:
 
   literal-namespace:
     patterns:
+    - include: '#literal-language-namespace'
+
     # e.g. ns::var
     - name: meta.path.rhai
       match: ([_a-zA-Z]\w*)\s*(\:\:)(?!<)
