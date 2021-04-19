@@ -507,6 +507,14 @@
         {
           "name": "constant.language.boolean.false.rhai",
           "match": "\\bfalse\\b"
+        },
+        {
+          "match": "(?<!\\:\\:)\\s*(global)\\s*(?=\\:\\:)",
+          "captures": {
+            "1": {
+              "name": "constant.language.namespace.global.rhai entity.name.namespace.rhai"
+            }
+          }
         }
       ]
     },
