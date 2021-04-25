@@ -2,8 +2,8 @@ Rhai Language Support for Visual Studio Code
 ===========================================
 
 [![License](https://img.shields.io/github/license/rhaiscript/vscode-rhai)](https://github.com/rhaiscript/vscode-rhai/blob/master/LICENSE.md)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/rhaiscript.vscode-rhai)](https://marketplace.visualstudio.com/items?itemName=rhaiscript.vscode-rhai)
-[![Latest release](https://img.shields.io/github/release/rhaiscript/vscode-rhai.svg)](https://github.com/rhaiscript/vscode-rhai/releases/latest)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/rhaiscript.vscode-rhai?logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=rhaiscript.vscode-rhai)
+[![Latest release](https://img.shields.io/github/release/rhaiscript/vscode-rhai.svg?logo=github)](https://github.com/rhaiscript/vscode-rhai/releases/latest)
 
 [![Rhai logo](https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.png)](https://rhai.rs)
 
