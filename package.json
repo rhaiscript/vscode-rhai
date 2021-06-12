@@ -18,6 +18,11 @@
 		"Programming Languages",
 		"Formatters"
 	],
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": true
+		}
+	},
 	"scripts": {
 		"build:syntax": "ts-node syntax/build.ts",
 		"build:ts": "tsc -b",
