@@ -817,7 +817,7 @@
         },
         {
           "name": "invalid.illegal.keyword.rhai",
-          "match": "\\b(var|static|begin|end|shared|each|then|goto|exit|unless|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\\b"
+          "match": "\\b(var|static|shared|goto|exit|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\\b"
         }
       ]
     }
