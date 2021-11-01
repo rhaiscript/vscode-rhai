@@ -153,12 +153,12 @@ repository:
 
   literal-module:
     patterns:
-    - name: keyword.control.import.rhai
+    - name: keyword.other.module.rhai
       match: \b(import|export|as)\b
 
   literal-function:
     patterns:
-    # e.g. [private] fn play(arg1, arg2) {  }
+    # [private] fn play(arg1, arg2) {  }
     - name: meta.function.rhai
       begin: >-
         (?x)
@@ -172,6 +172,12 @@ repository:
       end: (?<=\))
       patterns:
       - include: '#parameters-list'
+
+    - name: keyword.other.function.rhai
+      match: \b(fn)\b
+
+    - name: keyword.other.modifier.rhai
+      match: \b(private)\b
 
   literal-closure:
     patterns:
@@ -506,6 +512,6 @@ repository:
     patterns:
     # built-ins
     - name: support.function.rhai
-      match: \b(print|debug|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\b
+      match: \b(print|debug|Fn|call|curry|eval|type_of|is_def_var|is_def_fn|is_shared)\b
     - name: invalid.illegal.keyword.rhai
       match: \b(var|static|shared|goto|exit|match|case|public|protected|new|use|with|module|package|super|thread|spawn|go|await|async|sync|yield|default|void|null|nil)\b
