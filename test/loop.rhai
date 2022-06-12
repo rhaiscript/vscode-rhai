@@ -1,4 +1,4 @@
-// This script runs an infinite loop, ending it with a break statement
+// This script runs an infinite loop, ending it with a break statement.
 
 let x = 10;
 
@@ -8,7 +8,7 @@ loop {
 
     x -= 1;
 
-	if x <= 0 { break; }
+    if x <= 0 { break; }
 }
 
 export x as foo;

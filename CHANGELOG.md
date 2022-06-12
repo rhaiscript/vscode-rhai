@@ -1,3 +1,10 @@
+Version 0.6.6
+=============
+
+* Add the range operator `..`
+* Add elvis operators.
+
+
 Version 0.6.5
 =============
 

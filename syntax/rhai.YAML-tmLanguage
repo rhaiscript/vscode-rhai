@@ -2,7 +2,7 @@
 # This language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Repo: https://github.com/rhaiscript
 name: Rhai
-version: v0.6.3
+version: v0.6.6
 fileTypes: [rhai]
 uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
 scopeName: source.rhai
@@ -68,7 +68,7 @@ repository:
   square-brackets:
     patterns:
     - name: meta.group.braces.square
-      begin: \[
+      begin: \[|\?\[
       beginCaptures:
         '0': {name: meta.brace.square.rhai}
       end: \]
@@ -262,7 +262,7 @@ repository:
     - name: meta.function-call.method.without-arguments.rhai
       match: >-
         (?x)
-          (?<=\.)
+          (?<=(\.|\?\.))
           \s*([_a-zA-Z]\w*)\s*
           (\(\s*\))
       captures:
@@ -272,7 +272,7 @@ repository:
     - name: meta.function-call.method.with-arguments.rhai
       match: >-
         (?x)
-          (?<=\.)
+          (?<=(\.|\?\.))
           \s*([_a-zA-Z]\w*)\s*
           (?=\()
       captures:
@@ -328,44 +328,48 @@ repository:
           !(?!=)| # logical-not     right-to-left   right
           &&    | # logical-and     left-to-right   both
           \|\|    # logical-or      left-to-right   both
+    - name: keyword.operator.coalesce.rhai
+      match: >-
+        (?x)
+          \?\?    # null-coalesce   left-to-right   both
     - name: keyword.operator.assignment.rhai
       match: >-
         (?x)
-          =(?![=>]) # assignment      right-to-left   both
+          =(?![=>]) # assignment    right-to-left   both
     - name: keyword.operator.assignment.augmented.rhai
       match: >-
         (?x)
-          %=   | # assignment      right-to-left   both
-          &=   | # assignment      right-to-left   both
-          \*\*=| # assignment      right-to-left   both
-          (?<!\*)\*= | # assignment      right-to-left   both
-          \+=  | # assignment      right-to-left   both
-          -=   | # assignment      right-to-left   both
-          /=   | # assignment      right-to-left   both
-          \^=  | # assignment      right-to-left   both
-          \|=  | # assignment      right-to-left   both
-          <<=  | # assignment      right-to-left   both
-          >>=    # assignment      right-to-left   both
+          %=   | # assignment       right-to-left   both
+          &=   | # assignment       right-to-left   both
+          \*\*=| # assignment       right-to-left   both
+          (?<!\*)\*= | # assignment right-to-left   both
+          \+=  | # assignment       right-to-left   both
+          -=   | # assignment       right-to-left   both
+          /=   | # assignment       right-to-left   both
+          \^=  | # assignment       right-to-left   both
+          \|=  | # assignment       right-to-left   both
+          <<=  | # assignment       right-to-left   both
+          >>=    # assignment       right-to-left   both
     - name: keyword.operator.bitwise.rhai
       match: >-
         (?x)
-          <<   | # bitwise-shift   left-to-right   both
-          >>   | # bitwise-shift   left-to-right   both
-          &    | # bitwise-and     left-to-right   both
-          \^   | # bitwise-xor     left-to-right   both
-          \|     # bitwise-or      left-to-right   both
+          <<   | # bitwise-shift    left-to-right   both
+          >>   | # bitwise-shift    left-to-right   both
+          &    | # bitwise-and      left-to-right   both
+          \^   | # bitwise-xor      left-to-right   both
+          \|     # bitwise-or       left-to-right   both
     - name: keyword.operator.relational.rhai
       match: >-
         (?x)
-          <=     | # relational      left-to-right   both
-          >=     | # relational      left-to-right   both
-          <(?!-) | # relational      left-to-right   both
-          (?<!-)>  # relational      left-to-right   both
+          <=     | # relational     ;eft-to-right   both
+          >=     | # relational     left-to-right   both
+          <(?!-) | # relational     left-to-right   both
+          (?<!-)>  # relational     left-to-right   both
     - name: keyword.operator.comparison.rhai
       match: >-
         (?x)
-          ==(?!=) | # equality        left-to-right   both
-          !=(?!=)   # equality        left-to-right   both
+          ==(?!=) | # equality       left-to-right   both
+          !=(?!=)   # equality       left-to-right   both
     - name: keyword.operator.arithmetic.rhai
       match: >-
         (?x)
@@ -375,12 +379,14 @@ repository:
           \*(?!\))  | # multiplication  left-to-right   both
           \+(?!\+)  | # addition        left-to-right   both
           -(?![>-])   # subtraction     left-to-right   both
+    - name: keyword.operator.range.rhai
+      match: \.\.(?!\.)
     - name: keyword.operator.accessor.rhai punctuation.accessor.rhai
-      match: \.(?!\.)
+      match: \.(?!\.)|\?\.
     - name: punctuation.separator.switch.case.rhai
       match: =>
     - name: invalid.illegal.operator.rhai
-      match: (\(\*|\*\)|\+\+|--|\.\.+|~|#(?!{)|@|\$(?!{)|->|<-|===|!==|\:=|\:\:<)
+      match: (\(\*|\*\)|\+\+|--|\.\.\.+|~|#(?!{)|@|\?|\$(?!{)|->|<-|===|!==|\:=|\:\:<)
 
   literal-labels:
     patterns:
@@ -496,12 +502,12 @@ repository:
       match: '[A-Z][_\dA-Z]*\b'
 
     # e.g. obj.property
-    - match: (?<!\.)\s*([_a-zA-Z]\w*)\s*(?=\.)
+    - match: (?<!\.)\s*([_a-zA-Z]\w*)\s*(?=(\.|\?\.))
       captures:
         '1': {name: variable.other.object.rhai}
 
     # e.g. obj.property
-    - match: (?<=\.)\s*([_a-zA-Z]\w*)
+    - match: (?<=(\.|\?\.))\s*([_a-zA-Z]\w*)
       captures:
         '1': {name: variable.other.property.rhai entity.name.property.rhai}
 

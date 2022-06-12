@@ -1,9 +1,9 @@
-// This script defines a function and calls it
+// This script defines a function and calls it.
 
-fn bob() {
+fn call_me() {
     return 3;
 }
 
-print("bob() should be 3:");
+let result = call_me();
 
-print(bob());
+print(`call_me() should be 3: ${result}`);

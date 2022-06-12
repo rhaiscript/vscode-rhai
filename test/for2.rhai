@@ -1,3 +1,5 @@
+// This script runs for-loops
+
 const MAX = 1_000_000;
 
 print(`Iterating an array with ${MAX} items...`);
@@ -8,15 +10,19 @@ let now = timestamp();
 
 let list = [];
 
-for i in range(0, MAX) {
+// Loop over range
+for i in 0..MAX {
     list.push(i);
 }
 
+print(`Time = ${now.elapsed} seconds...`);
+
 let sum = 0;
 
+// Loop over array
 for i in list {
     sum += i;
 }
 
 print(`Sum = ${sum}`);
-print(`Finished. Run time = ${now.elapsed} seconds.`);
+print(`Finished. Total run time = ${now.elapsed} seconds.`);

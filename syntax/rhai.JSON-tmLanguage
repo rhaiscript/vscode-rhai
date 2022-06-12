@@ -1,6 +1,6 @@
 {
   "name": "Rhai",
-  "version": "v0.6.3",
+  "version": "v0.6.6",
   "fileTypes": [
     "rhai"
   ],
@@ -122,7 +122,7 @@
       "patterns": [
         {
           "name": "meta.group.braces.square",
-          "begin": "\\[",
+          "begin": "\\[|\\?\\[",
           "beginCaptures": {
             "0": {
               "name": "meta.brace.square.rhai"
@@ -477,7 +477,7 @@
       "patterns": [
         {
           "name": "meta.function-call.method.without-arguments.rhai",
-          "match": "(?x)  (?<=\\.)\n  \\s*([_a-zA-Z]\\w*)\\s*\n  (\\(\\s*\\))",
+          "match": "(?x)  (?<=(\\.|\\?\\.))\n  \\s*([_a-zA-Z]\\w*)\\s*\n  (\\(\\s*\\))",
           "captures": {
             "1": {
               "name": "entity.name.function.rhai"
@@ -489,7 +489,7 @@
         },
         {
           "name": "meta.function-call.method.with-arguments.rhai",
-          "match": "(?x)  (?<=\\.)\n  \\s*([_a-zA-Z]\\w*)\\s*\n  (?=\\()",
+          "match": "(?x)  (?<=(\\.|\\?\\.))\n  \\s*([_a-zA-Z]\\w*)\\s*\n  (?=\\()",
           "captures": {
             "1": {
               "name": "entity.name.function.rhai"
@@ -574,32 +574,40 @@
           "match": "(?x)  !(?!=)| # logical-not     right-to-left   right\n  &&    | # logical-and     left-to-right   both\n  \\|\\|    # logical-or      left-to-right   both"
         },
         {
+          "name": "keyword.operator.coalesce.rhai",
+          "match": "(?x)  \\?\\?    # null-coalesce   left-to-right   both"
+        },
+        {
           "name": "keyword.operator.assignment.rhai",
-          "match": "(?x)  =(?![=>]) # assignment      right-to-left   both"
+          "match": "(?x)  =(?![=>]) # assignment    right-to-left   both"
         },
         {
           "name": "keyword.operator.assignment.augmented.rhai",
-          "match": "(?x)  %=   | # assignment      right-to-left   both\n  &=   | # assignment      right-to-left   both\n  \\*\\*=| # assignment      right-to-left   both\n  (?<!\\*)\\*= | # assignment      right-to-left   both\n  \\+=  | # assignment      right-to-left   both\n  -=   | # assignment      right-to-left   both\n  /=   | # assignment      right-to-left   both\n  \\^=  | # assignment      right-to-left   both\n  \\|=  | # assignment      right-to-left   both\n  <<=  | # assignment      right-to-left   both\n  >>=    # assignment      right-to-left   both"
+          "match": "(?x)  %=   | # assignment       right-to-left   both\n  &=   | # assignment       right-to-left   both\n  \\*\\*=| # assignment       right-to-left   both\n  (?<!\\*)\\*= | # assignment right-to-left   both\n  \\+=  | # assignment       right-to-left   both\n  -=   | # assignment       right-to-left   both\n  /=   | # assignment       right-to-left   both\n  \\^=  | # assignment       right-to-left   both\n  \\|=  | # assignment       right-to-left   both\n  <<=  | # assignment       right-to-left   both\n  >>=    # assignment       right-to-left   both"
         },
         {
           "name": "keyword.operator.bitwise.rhai",
-          "match": "(?x)  <<   | # bitwise-shift   left-to-right   both\n  >>   | # bitwise-shift   left-to-right   both\n  &    | # bitwise-and     left-to-right   both\n  \\^   | # bitwise-xor     left-to-right   both\n  \\|     # bitwise-or      left-to-right   both"
+          "match": "(?x)  <<   | # bitwise-shift    left-to-right   both\n  >>   | # bitwise-shift    left-to-right   both\n  &    | # bitwise-and      left-to-right   both\n  \\^   | # bitwise-xor      left-to-right   both\n  \\|     # bitwise-or       left-to-right   both"
         },
         {
           "name": "keyword.operator.relational.rhai",
-          "match": "(?x)  <=     | # relational      left-to-right   both\n  >=     | # relational      left-to-right   both\n  <(?!-) | # relational      left-to-right   both\n  (?<!-)>  # relational      left-to-right   both"
+          "match": "(?x)  <=     | # relational     ;eft-to-right   both\n  >=     | # relational     left-to-right   both\n  <(?!-) | # relational     left-to-right   both\n  (?<!-)>  # relational     left-to-right   both"
         },
         {
           "name": "keyword.operator.comparison.rhai",
-          "match": "(?x)  ==(?!=) | # equality        left-to-right   both\n  !=(?!=)   # equality        left-to-right   both"
+          "match": "(?x)  ==(?!=) | # equality       left-to-right   both\n  !=(?!=)   # equality       left-to-right   both"
         },
         {
           "name": "keyword.operator.arithmetic.rhai",
           "match": "(?x)  /         | # division        left-to-right   both\n  %         | # modulus         left-to-right   both\n  \\*\\*      | # power           left-to-right   both\n  \\*(?!\\))  | # multiplication  left-to-right   both\n  \\+(?!\\+)  | # addition        left-to-right   both\n  -(?![>-])   # subtraction     left-to-right   both"
         },
         {
+          "name": "keyword.operator.range.rhai",
+          "match": "\\.\\.(?!\\.)"
+        },
+        {
           "name": "keyword.operator.accessor.rhai punctuation.accessor.rhai",
-          "match": "\\.(?!\\.)"
+          "match": "\\.(?!\\.)|\\?\\."
         },
         {
           "name": "punctuation.separator.switch.case.rhai",
@@ -607,7 +615,7 @@
         },
         {
           "name": "invalid.illegal.operator.rhai",
-          "match": "(\\(\\*|\\*\\)|\\+\\+|--|\\.\\.+|~|#(?!{)|@|\\$(?!{)|->|<-|===|!==|\\:=|\\:\\:<)"
+          "match": "(\\(\\*|\\*\\)|\\+\\+|--|\\.\\.\\.+|~|#(?!{)|@|\\?|\\$(?!{)|->|<-|===|!==|\\:=|\\:\\:<)"
         }
       ]
     },
@@ -796,7 +804,7 @@
           "match": "[A-Z][_\\dA-Z]*\\b"
         },
         {
-          "match": "(?<!\\.)\\s*([_a-zA-Z]\\w*)\\s*(?=\\.)",
+          "match": "(?<!\\.)\\s*([_a-zA-Z]\\w*)\\s*(?=(\\.|\\?\\.))",
           "captures": {
             "1": {
               "name": "variable.other.object.rhai"
@@ -804,7 +812,7 @@
           }
         },
         {
-          "match": "(?<=\\.)\\s*([_a-zA-Z]\\w*)",
+          "match": "(?<=(\\.|\\?\\.))\\s*([_a-zA-Z]\\w*)",
           "captures": {
             "1": {
               "name": "variable.other.property.rhai entity.name.property.rhai"
