@@ -262,7 +262,7 @@ repository:
     - name: meta.function-call.method.without-arguments.rhai
       match: >-
         (?x)
-          (?<=(\.|\?\.))
+          (?<=\.|\?\.)
           \s*([_a-zA-Z]\w*)\s*
           (\(\s*\))
       captures:
@@ -272,7 +272,7 @@ repository:
     - name: meta.function-call.method.with-arguments.rhai
       match: >-
         (?x)
-          (?<=(\.|\?\.))
+          (?<=\.|\?\.)
           \s*([_a-zA-Z]\w*)\s*
           (?=\()
       captures:
@@ -361,7 +361,7 @@ repository:
     - name: keyword.operator.relational.rhai
       match: >-
         (?x)
-          <=     | # relational     ;eft-to-right   both
+          <=     | # relational     left-to-right   both
           >=     | # relational     left-to-right   both
           <(?!-) | # relational     left-to-right   both
           (?<!-)>  # relational     left-to-right   both
@@ -380,7 +380,7 @@ repository:
           \+(?!\+)  | # addition        left-to-right   both
           -(?![>-])   # subtraction     left-to-right   both
     - name: keyword.operator.range.rhai
-      match: \.\.(?!\.)
+      match: \.\.(?![\.=])|\.\.=
     - name: keyword.operator.accessor.rhai punctuation.accessor.rhai
       match: \.(?!\.)|\?\.
     - name: punctuation.separator.switch.case.rhai
@@ -507,7 +507,7 @@ repository:
         '1': {name: variable.other.object.rhai}
 
     # e.g. obj.property
-    - match: (?<=(\.|\?\.))\s*([_a-zA-Z]\w*)
+    - match: (?<=\.|\?\.)\s*([_a-zA-Z]\w*)
       captures:
         '1': {name: variable.other.property.rhai entity.name.property.rhai}
 
