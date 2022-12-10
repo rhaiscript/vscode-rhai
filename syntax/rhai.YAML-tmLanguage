@@ -162,9 +162,9 @@ repository:
     - name: meta.function.rhai
       begin: >-
         (?x)
-          (?:\b(private)\s+)?
-          \s*(fn)
-          \s*([_a-zA-Z]\w*)\s*
+        (?:\b(private)\s+)?   # private
+        \s*(fn)               # fn
+        \s*([_a-zA-Z]\w*)\s*  # fn_name
       beginCaptures:
         '1': {name: storage.modifier.rhai}
         '2': {name: storage.type.function.rhai}
@@ -241,8 +241,9 @@ repository:
     - name: meta.function-call.without-arguments.rhai
       match: >-
         (?x)
-          ([_a-zA-Z]\w*)(!)?\s*
-          (\(\s*\))
+        ([_a-zA-Z]\w*)          # fn_name
+        (!)?\s*                 # !
+        (\(\s*\))               # ()
       captures:
         '1': {name: entity.name.function.rhai}
         '2': {name: punctuation.function-call.capture.rhai}
@@ -251,8 +252,9 @@ repository:
     - name: meta.function-call.with-arguments.rhai
       match: >-
         (?x)
-          ([_a-zA-Z]\w*)(!)?\s*
-          (?=\()
+        ([_a-zA-Z]\w*)          # fn_name
+        (!)?\s*                 # !
+        (?=\()                  # (
       captures:
         '1': {name: entity.name.function.rhai}
         '2': {name: punctuation.function-call.capture.rhai}
@@ -262,9 +264,9 @@ repository:
     - name: meta.function-call.method.without-arguments.rhai
       match: >-
         (?x)
-          (?<=\.|\?\.)
-          \s*([_a-zA-Z]\w*)\s*
-          (\(\s*\))
+        (?<=\.|\?\.)            # .
+        \s*([_a-zA-Z]\w*)\s*    # fn_name
+        (\(\s*\))               # ()
       captures:
         '1': {name: entity.name.function.rhai}
         '2': {name: meta.group.braces.round.function.arguments.rhai}
@@ -272,9 +274,9 @@ repository:
     - name: meta.function-call.method.with-arguments.rhai
       match: >-
         (?x)
-          (?<=\.|\?\.)
-          \s*([_a-zA-Z]\w*)\s*
-          (?=\()
+        (?<=\.|\?\.)            # .
+        \s*([_a-zA-Z]\w*)\s*    # fn_name
+        (?=\()                  # (
       captures:
         '1': {name: entity.name.function.rhai}
 
@@ -309,7 +311,7 @@ repository:
     - include: '#literal-keyword-storage'
 
     - name: keyword.control.flow.rhai
-      match: \b(return)\b
+      match: \breturn\b
 
     - name: keyword.control.conditional.rhai
       match: \b(if|else|switch)\b
@@ -325,64 +327,70 @@ repository:
     - name: keyword.operator.logical.rhai
       match: >-
         (?x)
-          !(?!=)| # logical-not     right-to-left   right
-          &&    | # logical-and     left-to-right   both
-          \|\|    # logical-or      left-to-right   both
+        !(?!=)        | # logical-not     right-to-left   right
+        &&            | # logical-and     left-to-right   both
+        \|\|            # logical-or      left-to-right   both
     - name: keyword.operator.coalesce.rhai
       match: >-
         (?x)
-          \?\?    # null-coalesce   left-to-right   both
+        \?\?            # null-coalesce   left-to-right   both
     - name: keyword.operator.assignment.rhai
       match: >-
         (?x)
-          =(?![=>]) # assignment    right-to-left   both
+        =(?![=>])       # assignment      right-to-left   both
     - name: keyword.operator.assignment.augmented.rhai
       match: >-
         (?x)
-          %=   | # assignment       right-to-left   both
-          &=   | # assignment       right-to-left   both
-          \*\*=| # assignment       right-to-left   both
-          (?<!\*)\*= | # assignment right-to-left   both
-          \+=  | # assignment       right-to-left   both
-          -=   | # assignment       right-to-left   both
-          /=   | # assignment       right-to-left   both
-          \^=  | # assignment       right-to-left   both
-          \|=  | # assignment       right-to-left   both
-          <<=  | # assignment       right-to-left   both
-          >>=    # assignment       right-to-left   both
+        %=            | # assignment      right-to-left   both
+        &=            | # assignment      right-to-left   both
+        \*\*=         | # assignment      right-to-left   both
+        (?<!\*)\*=    | # assignment      right-to-left   both
+        \+=           | # assignment      right-to-left   both
+        -=            | # assignment      right-to-left   both
+        /=            | # assignment      right-to-left   both
+        \^=           | # assignment      right-to-left   both
+        \|=           | # assignment      right-to-left   both
+        <<=           | # assignment      right-to-left   both
+        >>=             # assignment      right-to-left   both
     - name: keyword.operator.bitwise.rhai
       match: >-
         (?x)
-          <<   | # bitwise-shift    left-to-right   both
-          >>   | # bitwise-shift    left-to-right   both
-          &    | # bitwise-and      left-to-right   both
-          \^   | # bitwise-xor      left-to-right   both
-          \|     # bitwise-or       left-to-right   both
+        <<            | # bitwise-shift   left-to-right   both
+        >>            | # bitwise-shift   left-to-right   both
+        &             | # bitwise-and     left-to-right   both
+        \^            | # bitwise-xor     left-to-right   both
+        \|              # bitwise-or      left-to-right   both
     - name: keyword.operator.relational.rhai
       match: >-
         (?x)
-          <=     | # relational     left-to-right   both
-          >=     | # relational     left-to-right   both
-          <(?!-) | # relational     left-to-right   both
-          (?<!-)>  # relational     left-to-right   both
+        <=            | # relational      left-to-right   both
+        >=            | # relational      left-to-right   both
+        <(?!-)        | # relational      left-to-right   both
+        (?<!-)>         # relational      left-to-right   both
     - name: keyword.operator.comparison.rhai
       match: >-
         (?x)
-          ==(?!=) | # equality       left-to-right   both
-          !=(?!=)   # equality       left-to-right   both
+        ==(?!=)       | # equality        left-to-right   both
+        !=(?!=)         # equality        left-to-right   both
     - name: keyword.operator.arithmetic.rhai
       match: >-
         (?x)
-          /         | # division        left-to-right   both
-          %         | # modulus         left-to-right   both
-          \*\*      | # power           left-to-right   both
-          \*(?!\))  | # multiplication  left-to-right   both
-          \+(?!\+)  | # addition        left-to-right   both
-          -(?![>-])   # subtraction     left-to-right   both
+        /             | # division        left-to-right   both
+        %             | # modulus         left-to-right   both
+        \*\*          | # power           left-to-right   both
+        \*(?!\))      | # multiplication  left-to-right   both
+        \+(?!\+)      | # addition        left-to-right   both
+        -(?![>-])       # subtraction     left-to-right   both
     - name: keyword.operator.range.rhai
-      match: \.\.(?![\.=])|\.\.=
+      match: >-
+        (?x)
+        \.\.(?![\.=]) | # exclusive range
+        \.\.=           # inclusive range
     - name: keyword.operator.accessor.rhai punctuation.accessor.rhai
-      match: \.(?!\.)|\?\.
+      match: >-
+        (?x)
+        \.(?!\.)      | # dot property
+        \?\.            # elvis operator
     - name: punctuation.separator.switch.case.rhai
       match: =>
     - name: invalid.illegal.operator.rhai
@@ -392,8 +400,8 @@ repository:
     patterns:
     - begin: >-
         (?x)
-          (?<!\?)(?<!\?\s)
-            (?=((")((?:[^\:"]|\\")*)("))\s*:)
+        (?<!\?)(?<!\?\s)
+        (?=((")((?:[^\:"]|\\")*)("))\s*:)
       end: ':'
       endCaptures:
         '0': {name: punctuation.separator.key-value.rhai}
@@ -409,15 +417,13 @@ repository:
     patterns:
     - name: constant.numeric.rhai
       match: >-
-        (?xi)
-          (?:
-            \b0b[0-1][_0-1]*|                         # binary
-            \b0o[0-7][_0-7]*|                         # octal
-            \b0x[\da-f][_\da-f]*|                     # hex
-            (\B[+\-])?\b\d[_\d]*\.\d[_\d]*(e[+\-]?\d[_\d]*)?| # e.g. 999.999, 999.99e+123
-            (\B[+\-])?\b\d[_\d]*\.\B|                 # e.g. 999.
-            (\B[+\-])?\b\d[_\d]*(e[+\-]?\d[_\d]*)?    # e.g. 999, 999e+123
-          )
+        (?x)
+        \b0b[0-1][_0-1]*|                         # binary
+        \b0o[0-7][_0-7]*|                         # octal
+        \b0x[\da-fA-F][_\da-fA-F]*|               # hex
+        (\B[+\-])?\d[_\d]*\.\d[_\d]*(e[+\-]?\d[_\d]*)?| # e.g. 999.999, 999.99e+123
+        (\B[+\-])?\d[_\d]*\.\B|                   # e.g. 999.
+        (\B[+\-])?\d[_\d]*(e[+\-]?\d[_\d]*)?      # e.g. 999, 999e+123
 
   literal-punctuation:
     patterns:

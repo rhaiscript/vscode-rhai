@@ -298,7 +298,7 @@
       "patterns": [
         {
           "name": "meta.function.rhai",
-          "begin": "(?x)  (?:\\b(private)\\s+)?\n  \\s*(fn)\n  \\s*([_a-zA-Z]\\w*)\\s*",
+          "begin": "(?x) (?:\\b(private)\\s+)?   # private modifier \\s*(fn)               # fn \\s*([_a-zA-Z]\\w*)\\s*  # fn_name",
           "beginCaptures": {
             "1": {
               "name": "storage.modifier.rhai"
@@ -446,7 +446,7 @@
       "patterns": [
         {
           "name": "meta.function-call.without-arguments.rhai",
-          "match": "(?x)  ([_a-zA-Z]\\w*)(!)?\\s*\n  (\\(\\s*\\))",
+          "match": "(?x) ([_a-zA-Z]\\w*)          # fn_name (!)?\\s*                 # ! (\\(\\s*\\))               # ()",
           "captures": {
             "1": {
               "name": "entity.name.function.rhai"
@@ -461,7 +461,7 @@
         },
         {
           "name": "meta.function-call.with-arguments.rhai",
-          "match": "(?x)  ([_a-zA-Z]\\w*)(!)?\\s*\n  (?=\\()",
+          "match": "(?x) ([_a-zA-Z]\\w*)          # fn_name (!)?\\s*                 # ! (?=\\()                  # (",
           "captures": {
             "1": {
               "name": "entity.name.function.rhai"
@@ -477,7 +477,7 @@
       "patterns": [
         {
           "name": "meta.function-call.method.without-arguments.rhai",
-          "match": "(?x)  (?<=\\.|\\?\\.)\n  \\s*([_a-zA-Z]\\w*)\\s*\n  (\\(\\s*\\))",
+          "match": "(?x) (?<=\\.|\\?\\.)            # . \\s*([_a-zA-Z]\\w*)\\s*    # fn_name (\\(\\s*\\))               # ()",
           "captures": {
             "1": {
               "name": "entity.name.function.rhai"
@@ -489,7 +489,7 @@
         },
         {
           "name": "meta.function-call.method.with-arguments.rhai",
-          "match": "(?x)  (?<=\\.|\\?\\.)\n  \\s*([_a-zA-Z]\\w*)\\s*\n  (?=\\()",
+          "match": "(?x) (?<=\\.|\\?\\.)            # . \\s*([_a-zA-Z]\\w*)\\s*    # fn_name (?=\\()                  # (",
           "captures": {
             "1": {
               "name": "entity.name.function.rhai"
@@ -571,43 +571,43 @@
       "patterns": [
         {
           "name": "keyword.operator.logical.rhai",
-          "match": "(?x)  !(?!=)| # logical-not     right-to-left   right\n  &&    | # logical-and     left-to-right   both\n  \\|\\|    # logical-or      left-to-right   both"
+          "match": "(?x) !(?!=)| # logical-not     right-to-left   right &&    | # logical-and     left-to-right   both \\|\\|    # logical-or      left-to-right   both"
         },
         {
           "name": "keyword.operator.coalesce.rhai",
-          "match": "(?x)  \\?\\?    # null-coalesce   left-to-right   both"
+          "match": "(?x) \\?\\?    # null-coalesce   left-to-right   both"
         },
         {
           "name": "keyword.operator.assignment.rhai",
-          "match": "(?x)  =(?![=>]) # assignment    right-to-left   both"
+          "match": "(?x) =(?![=>]) # assignment    right-to-left   both"
         },
         {
           "name": "keyword.operator.assignment.augmented.rhai",
-          "match": "(?x)  %=   | # assignment       right-to-left   both\n  &=   | # assignment       right-to-left   both\n  \\*\\*=| # assignment       right-to-left   both\n  (?<!\\*)\\*= | # assignment right-to-left   both\n  \\+=  | # assignment       right-to-left   both\n  -=   | # assignment       right-to-left   both\n  /=   | # assignment       right-to-left   both\n  \\^=  | # assignment       right-to-left   both\n  \\|=  | # assignment       right-to-left   both\n  <<=  | # assignment       right-to-left   both\n  >>=    # assignment       right-to-left   both"
+          "match": "(?x) %=   | # assignment       right-to-left   both &=   | # assignment       right-to-left   both \\*\\*=| # assignment       right-to-left   both (?<!\\*)\\*= | # assignment right-to-left   both \\+=  | # assignment       right-to-left   both -=   | # assignment       right-to-left   both /=   | # assignment       right-to-left   both \\^=  | # assignment       right-to-left   both \\|=  | # assignment       right-to-left   both <<=  | # assignment       right-to-left   both >>=    # assignment       right-to-left   both"
         },
         {
           "name": "keyword.operator.bitwise.rhai",
-          "match": "(?x)  <<   | # bitwise-shift    left-to-right   both\n  >>   | # bitwise-shift    left-to-right   both\n  &    | # bitwise-and      left-to-right   both\n  \\^   | # bitwise-xor      left-to-right   both\n  \\|     # bitwise-or       left-to-right   both"
+          "match": "(?x) <<   | # bitwise-shift    left-to-right   both >>   | # bitwise-shift    left-to-right   both &    | # bitwise-and      left-to-right   both \\^   | # bitwise-xor      left-to-right   both \\|     # bitwise-or       left-to-right   both"
         },
         {
           "name": "keyword.operator.relational.rhai",
-          "match": "(?x)  <=     | # relational     left-to-right   both\n  >=     | # relational     left-to-right   both\n  <(?!-) | # relational     left-to-right   both\n  (?<!-)>  # relational     left-to-right   both"
+          "match": "(?x) <=     | # relational     left-to-right   both >=     | # relational     left-to-right   both <(?!-) | # relational     left-to-right   both (?<!-)>  # relational     left-to-right   both"
         },
         {
           "name": "keyword.operator.comparison.rhai",
-          "match": "(?x)  ==(?!=) | # equality       left-to-right   both\n  !=(?!=)   # equality       left-to-right   both"
+          "match": "(?x) ==(?!=) | # equality       left-to-right   both !=(?!=)   # equality       left-to-right   both"
         },
         {
           "name": "keyword.operator.arithmetic.rhai",
-          "match": "(?x)  /         | # division        left-to-right   both\n  %         | # modulus         left-to-right   both\n  \\*\\*      | # power           left-to-right   both\n  \\*(?!\\))  | # multiplication  left-to-right   both\n  \\+(?!\\+)  | # addition        left-to-right   both\n  -(?![>-])   # subtraction     left-to-right   both"
+          "match": "(?x) /         | # division        left-to-right   both %         | # modulus         left-to-right   both \\*\\*      | # power           left-to-right   both \\*(?!\\))  | # multiplication  left-to-right   both \\+(?!\\+)  | # addition        left-to-right   both -(?![>-])   # subtraction     left-to-right   both"
         },
         {
           "name": "keyword.operator.range.rhai",
-          "match": "\\.\\.(?![\\.=])|\\.\\.="
+          "match": "(?x) \\.\\.(?![\\.=]) | # exclusive range \\.\\.=           # inclusive range"
         },
         {
           "name": "keyword.operator.accessor.rhai punctuation.accessor.rhai",
-          "match": "\\.(?!\\.)|\\?\\."
+          "match": "(?x) \\.(?!\\.)  | # dot property access \\?\\.        # elvis operator"
         },
         {
           "name": "punctuation.separator.switch.case.rhai",
@@ -622,7 +622,7 @@
     "literal-labels": {
       "patterns": [
         {
-          "begin": "(?x)  (?<!\\?)(?<!\\?\\s)\n    (?=((\")((?:[^\\:\"]|\\\\\")*)(\"))\\s*:)",
+          "begin": "(?x) (?<!\\?)(?<!\\?\\s) (?=((\")((?:[^\\:\"]|\\\\\")*)(\"))\\s*:)",
           "end": ":",
           "endCaptures": {
             "0": {
@@ -653,7 +653,7 @@
       "patterns": [
         {
           "name": "constant.numeric.rhai",
-          "match": "(?xi)  (?:\n    \\b0b[0-1][_0-1]*|                         # binary\n    \\b0o[0-7][_0-7]*|                         # octal\n    \\b0x[\\da-f][_\\da-f]*|                     # hex\n    (\\B[+\\-])?\\b\\d[_\\d]*\\.\\d[_\\d]*(e[+\\-]?\\d[_\\d]*)?| # e.g. 999.999, 999.99e+123\n    (\\B[+\\-])?\\b\\d[_\\d]*\\.\\B|                 # e.g. 999.\n    (\\B[+\\-])?\\b\\d[_\\d]*(e[+\\-]?\\d[_\\d]*)?    # e.g. 999, 999e+123\n  )"
+          "match": "(?x) \\b0b[0-1][_0-1]*|                         # binary \\b0o[0-7][_0-7]*|                         # octal \\b0x[\\da-fA-F][_\\da-fA-F]*|               # hex (\\B[+\\-])?\\b\\d[_\\d]*\\.\\d[_\\d]*(e[+\\-]?\\d[_\\d]*)?| # e.g. 999.999, 999.99e+123 (\\B[+\\-])?\\b\\d[_\\d]*\\.\\B|                 # e.g. 999. (\\B[+\\-])?\\b\\d[_\\d]*(e[+\\-]?\\d[_\\d]*)?    # e.g. 999, 999e+123"
         }
       ]
     },
