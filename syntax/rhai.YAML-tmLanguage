@@ -340,6 +340,11 @@ repository:
           !(?!=)| # logical-not     right-to-left   right
           &&    | # logical-and     left-to-right   both
           \|\|    # logical-or      left-to-right   both
+    - name: keyword.operator.containment.rhai
+      match: >-
+        (?x)
+          \bin\b   | # in             left-to-right   both
+          \B!in\b    # not-in         left-to-right   both
     - name: keyword.operator.coalesce.rhai
       match: >-
         (?x)

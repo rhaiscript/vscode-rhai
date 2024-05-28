@@ -5,7 +5,7 @@ let arr = [42, 123.456, "hello", true, "hey", 'x', 999, 1, 2, 3, 4];
 for item in arr {
     switch item {
         // Match single character
-        'f' => |a, b| a > b,
+        'f' => |a, b| a !in b,
         // Match single integer
         42 => print("The Answer!"),
         // Match a selection

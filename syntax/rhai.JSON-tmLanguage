@@ -597,6 +597,10 @@
           "match": "(?x)\n  !(?!=)| # logical-not     right-to-left   right\n  &&    | # logical-and     left-to-right   both\n  \\|\\|    # logical-or      left-to-right   both"
         },
         {
+          "name": "keyword.operator.containment.rhai",
+          "match": "(?x)\n  \\bin\\b   | # in             left-to-right   both\n  \\B!in\\b    # not-in         left-to-right   both"
+        },
+        {
           "name": "keyword.operator.coalesce.rhai",
           "match": "(?x)\n  \\?\\?    # null-coalesce   left-to-right   both"
         },
