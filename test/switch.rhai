@@ -4,8 +4,12 @@ let arr = [42, 123.456, "hello", true, "hey", 'x', 999, 1, 2, 3, 4];
 
 for item in arr {
     switch item {
+        // Match single character
+        'f' => |a, b| a > b,
         // Match single integer
         42 => print("The Answer!"),
+        // Match a selection
+        1 | 2 | () | 3 | 4 => print("One two three four!"),
         // Match single floating-point number
         123.456 => print(`Floating point... ${item}`),
         // Match single string
