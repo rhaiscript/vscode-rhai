@@ -1,3 +1,11 @@
+Version 0.6.7
+=============
+
+* Fixed recognition for ..= (inclusive range) operator.
+* Fixed parsing for | in switch case conditions (previously parses as a closure).
+*White-spaces no longer highlights.
+
+
 Version 0.6.6
 =============
 
