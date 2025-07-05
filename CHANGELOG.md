@@ -1,3 +1,13 @@
+Version 0.6.9
+=============
+
+* Fixed highlighting for dot-separated property access.
+
+Version 0.6.8
+=============
+
+* Add Rhai icon.
+
 Version 0.6.7
 =============
 

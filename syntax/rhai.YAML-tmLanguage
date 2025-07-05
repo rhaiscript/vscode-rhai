@@ -2,7 +2,7 @@
 # This language definition is based upon https://github.com/Benvie/JavaScriptNext.tmLanguage
 # Repo: https://github.com/rhaiscript
 name: Rhai
-version: v0.6.7
+version: v0.6.9
 fileTypes: [rhai]
 uuid: 1e76f176-ee1c-4331-a781-eb21c0da77cf
 scopeName: source.rhai
@@ -526,7 +526,7 @@ repository:
         '1': {name: variable.other.object.rhai}
 
     # e.g. obj.property
-    - match: (?<=(\.|\?\.))\s*([_a-zA-Z]\w*)
+    - match: (?<=\.|\?\.)\s*([_a-zA-Z]\w*)
       captures:
         '1': {name: variable.other.property.rhai entity.name.property.rhai}
 
