@@ -274,7 +274,7 @@ repository:
     - name: meta.function-call.method.without-arguments.rhai
       match: >-
         (?x)
-          (?<=(\.|\?\.))
+          (?:(?<=\.)|(?<=\?\.))
           \s*([_a-zA-Z]\w*)\s*
           (\(\s*\))
       captures:
@@ -284,7 +284,7 @@ repository:
     - name: meta.function-call.method.with-arguments.rhai
       match: >-
         (?x)
-          (?<=(\.|\?\.))
+          (?:(?<=\.)|(?<=\?\.))
           \s*([_a-zA-Z]\w*)\s*
           (?=\()
       captures:
@@ -526,7 +526,7 @@ repository:
         '1': {name: variable.other.object.rhai}
 
     # e.g. obj.property
-    - match: (?<=\.|\?\.)\s*([_a-zA-Z]\w*)
+    - match: (?:(?<=\.)|(?<=\?\.))\s*([_a-zA-Z]\w*)
       captures:
         '1': {name: variable.other.property.rhai entity.name.property.rhai}
 
