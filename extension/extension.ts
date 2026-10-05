@@ -105,6 +105,10 @@ async function compileGrainHandler(diagnostics: vscode.DiagnosticCollection, uri
     try {
         const bytes = grain.compile(document.getText())
         diagnostics.delete(document.uri)
+        if (document.languageId !== 'rhai' || !document.uri.path.endsWith('.rhai')) {
+            await vscode.window.showWarningMessage('Rhai: open a .rhai file to compile it to Grain')
+            return
+        }
         await vscode.workspace.fs.writeFile(document.uri.with({path: document.uri.path.replace(/\.rhai$/, '.rgrn')}), bytes)
     } catch (error) {
         const e = error as { name?: string; message: string; line?: number; column?: number }
