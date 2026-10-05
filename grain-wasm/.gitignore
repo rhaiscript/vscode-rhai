@@ -1,0 +1,8 @@
+# Rust
+/target
+.cargo/config.toml
+
+# IDE
+/.idea
+/.junie
+/.vscode
