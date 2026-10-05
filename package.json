@@ -26,7 +26,7 @@
     "scripts": {
         "build:syntax": "ts-node syntax/build.ts",
         "build:ts": "tsc -b",
-        "build": "npm run build:syntax -t && npm run build:wasm -t && npm run build:ts -t",
+        "build": "npm run build:syntax && npm run build:wasm && npm run build:ts",
         "build:wasm:cargo": "cargo build --release --target wasm32-unknown-unknown --manifest-path grain-wasm/Cargo.toml",
         "build:wasm:bindgen": "wasm-bindgen --target nodejs --out-dir dist/grain grain-wasm/target/wasm32-unknown-unknown/release/grain_wasm.wasm",
         "build:wasm": "npm run build:wasm:cargo && npm run build:wasm:bindgen",
@@ -57,12 +57,7 @@
                     "light": "./icons/rhai.png",
                     "dark": "./icons/rhai.png"
                 },
-                "configuration": "./syntax/rhai.configuration.json",
-                "configurationDefaults": {
-                    "explorer.fileNesting.patterns": {
-                        "*.rhai": "${capture}.rgrn"
-                    }
-                }
+                "configuration": "./syntax/rhai.configuration.json"
             }
         ],
         "grammars": [
@@ -82,6 +77,11 @@
                 }
             }
         ],
+        "configurationDefaults": {
+            "explorer.fileNesting.patterns": {
+                "*.rhai": "${capture}.rgrn"
+            }
+        },
         "commands": [
             {
                 "command": "rhai.format",
