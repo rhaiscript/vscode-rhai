@@ -7,6 +7,7 @@ Prerequisites
 - Install [Node.js](https://nodejs.org)
 
 - Install [TypeScript](https://www.typescriptlang.org)
+- Install [Rust](https://rust-lang.org/tools/install/)
 
 ```sh
 npm install -g typescript
@@ -17,6 +18,26 @@ npm install -g typescript
 ```sh
 npm install -g vsce
 ```
+
+- Add Rust target
+```shell
+rustup target add wasm32-unknown-unknown
+```
+
+- Install Wasm CLI
+```shell
+cargo install wasm-bindgen-cli
+```
+
+
+Build the Grain WASM module
+---------------------------
+
+```sh
+npm run build:wasm
+```
+Output goes to `dist/grain`.
+
 
 Fetch Node packages
 -------------------
@@ -42,3 +63,5 @@ vsce package
 ```
 
 Compiled package is `vscode-rhai-`_version_`.vsix` within the main directory.
+
+
