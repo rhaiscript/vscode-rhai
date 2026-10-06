@@ -7,7 +7,7 @@ import
     LanguageClient,
     LanguageClientOptions,
     Executable,
-} from 'vscode-languageclient'
+} from 'vscode-languageclient/node'
 
 
 let client: LanguageClient

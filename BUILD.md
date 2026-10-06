@@ -5,21 +5,10 @@ Prerequisites
 -------------
 
 - Install [Node.js](https://nodejs.org)
-
 - Install [TypeScript](https://www.typescriptlang.org)
 - Install [Rust](https://rust-lang.org/tools/install/)
 
-```sh
-npm install -g typescript
-```
-
-- Install [VSCE](https://github.com/Microsoft/vscode-vsce)
-
-```sh
-npm install -g vsce
-```
-
-- Add Rust target
+Add Rust target
 ```shell
 rustup target add wasm32-unknown-unknown
 ```
@@ -29,16 +18,6 @@ rustup target add wasm32-unknown-unknown
 cargo install wasm-bindgen-cli
 ```
 
-
-Build the Grain WASM module
----------------------------
-
-```sh
-npm run build:wasm
-```
-Output goes to `dist/grain`.
-
-
 Fetch Node packages
 -------------------
 
@@ -46,22 +25,25 @@ Fetch Node packages
 npm install
 ```
 
-Compile with TypeScript
------------------------
+Build the Grain WASM module with Rust and Build the extension
+---------------------------
 
 ```sh
-tsc
+npm run build
 ```
+Output goes to `dist/grain`.
 
-Compiled files are in the `dist` directory.
 
-Build VSIX package
-------------------
+Run Local
+---------------------
 
-```sh
-vsce package
+Build first (`npm run build`), then from the `vscode-rhai` directory run:
+```shell
+# Vscode
+# $PWD can be replaced by the absolute path to the `vscode-rhai` project directory
+code --extensionDevelopmentPath="$PWD" path/to/rhai-project
 ```
-
-Compiled package is `vscode-rhai-`_version_`.vsix` within the main directory.
+This opens a new VS Code window running this checkout of the extension.
+It takes the place of any installed Rhai extension in that window.
 
 

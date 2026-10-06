@@ -24,18 +24,16 @@
         }
     },
     "scripts": {
-        "build:syntax": "ts-node syntax/build.ts",
         "build:ts": "tsc -b",
-        "build": "npm run build:syntax && npm run build:wasm && npm run build:ts",
+        "build": "npm run build:wasm && npm run build:ts",
         "build:wasm:cargo": "cargo build --release --target wasm32-unknown-unknown --manifest-path grain-wasm/Cargo.toml",
         "build:wasm:bindgen": "wasm-bindgen --target nodejs --out-dir dist/grain grain-wasm/target/wasm32-unknown-unknown/release/grain_wasm.wasm",
         "build:wasm": "npm run build:wasm:cargo && npm run build:wasm:bindgen",
-        "pack": "npm run build && vsce package",
-        "lint": "tslint **/*.ts --fix"
+        "pack": "npm run build && vsce package"
     },
     "main": "./dist/extension.js",
     "engines": {
-        "vscode": "^1.74.0"
+        "vscode": "^1.79.0"
     },
     "activationEvents": [
         "onLanguage:rhai"
@@ -115,12 +113,10 @@
         }
     },
     "dependencies": {
-        "vscode-languageclient": "^6.1.3"
+        "vscode-languageclient": "~10.1.2"
     },
     "devDependencies": {
-        "@types/node": "^20.19.43",
-        "@types/vscode": "~1.74.0",
-        "tslint": "^6.0.0",
-        "typescript": "^5.9.3"
+        "@types/node": "~26.6.0",
+        "@types/vscode": "~1.79.0"
     }
 }

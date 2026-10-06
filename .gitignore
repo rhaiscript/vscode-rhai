@@ -10,6 +10,7 @@ dist/
 package-lock.json
 yarn.lock
 yarn-error.log
+*.tsbuildinfo
 
 # Release
 .vsixmanifest
