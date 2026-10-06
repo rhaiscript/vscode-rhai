@@ -34,16 +34,30 @@ npm run build
 Output goes to `dist/grain`.
 
 
-Run Local
+Run - Local Development
 ---------------------
 
-Build first (`npm run build`), then from the `vscode-rhai` directory run:
+Build first
+```shell
+npm run build
+```
+then from the `vscode-rhai` directory run:
 ```shell
 # Vscode
 # $PWD can be replaced by the absolute path to the `vscode-rhai` project directory
 code --extensionDevelopmentPath="$PWD" path/to/rhai-project
 ```
 This opens a new VS Code window running this checkout of the extension.
-It takes the place of any installed Rhai extension in that window.
 
+Run - Local packaging and installing extension on VSCode
+----------------------------------------------
+Package the extension with
+```shell
+npm run pack
+```
+This will generate a `vscode-rhai-x.x.x.vsix` extension file.
+To install, run from the `vscode-rhai` directory:
+```shell
+code --install-extension vscode-rhai-x.x.x.vsix
+```
 
