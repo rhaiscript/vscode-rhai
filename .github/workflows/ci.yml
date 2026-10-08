@@ -1,0 +1,78 @@
+name: CI CD pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  rust_style:
+    name: Rust Styling
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: grain-wasm
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v7
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Install Rust WASM target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Install Rust WASM CLI
+        run: cargo install wasm-bindgen-cli
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
+      - name: Run Cargo clippy
+        run: cargo clippy --all-targets --all-features
+
+  supply-chain:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: grain-wasm
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v7
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
+      - run: cargo deny check
+
+  rust_test:
+    name: Rust testing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: grain-wasm
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v7
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Install Rust WASM target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Install Rust WASM CLI
+        run: cargo install wasm-bindgen-cli
+      - name: Run cargo test
+        run: cargo test --all-features
+
+
