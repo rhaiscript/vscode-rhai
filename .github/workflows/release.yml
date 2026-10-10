@@ -57,6 +57,5 @@ jobs:
         with:
           name: vsix
       - run: gh release create "$GITHUB_REF_NAME" *.vsix --repo "$GITHUB_REPOSITORY" --generate-notes
-        if: ${{ !env.ACT }}
         env:
           GH_TOKEN: ${{ github.token }}
