@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  package:
+    name: Build extension
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Tag must match package.json version
+        run: |
+          pkg="v$(node -p "require('./package.json').version")"
+          [ "$pkg" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME != $pkg"; exit 1; }
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Install Rust WASM target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Install wasm-bindgen
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@0.2.129
+      - name: Install node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Package extension
+        run: npm run pack
+      - name: Upload extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: "*.vsix"
+          if-no-files-found: error
+  github_release:
+    needs: [package]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+      - run: gh release create "$GITHUB_REF_NAME" *.vsix --repo "$GITHUB_REPOSITORY" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

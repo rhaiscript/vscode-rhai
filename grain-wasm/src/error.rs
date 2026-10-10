@@ -5,7 +5,7 @@ use wasm_bindgen::JsValue;
 pub(crate) struct GrainError {
     error_message: String,
     line: Option<usize>,
-    column: Option<usize>
+    column: Option<usize>,
 }
 
 impl GrainError {
@@ -13,7 +13,7 @@ impl GrainError {
         GrainError {
             error_message,
             line,
-            column
+            column,
         }
     }
 }
@@ -23,7 +23,7 @@ impl From<ParseError> for GrainError {
         GrainError {
             error_message: err.err_type().to_string(),
             line: err.position().line(),
-            column: err.position().position()
+            column: err.position().position(),
         }
     }
 }
