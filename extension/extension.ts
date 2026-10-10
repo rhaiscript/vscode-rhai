@@ -11,13 +11,32 @@ import
 
 
 let client: LanguageClient
+let askedNestingThisSession: boolean = false
 
-function start_client() {
-    let serverOptions: Executable = {
+type CompileOnSave = 'off' | 'currentFile';
+
+interface RhaiConfig {
+    useLanguageServer: boolean
+    compileGrainOnSave: CompileOnSave,
+    promptFileNesting: boolean,
+}
+
+function getRhaiConfig(scope?: vscode.ConfigurationScope): RhaiConfig {
+    const c = vscode.workspace.getConfiguration('rhai', scope)
+    return {
+        useLanguageServer: c.get('useLanguageServer', true),
+        compileGrainOnSave: c.get('compileGrainOnSave', 'currentFile'),
+        promptFileNesting: c.get('promptFileNesting', true),
+    }
+}
+
+
+async function start_client() {
+    const serverOptions: Executable = {
         command: 'rhai-lsp',
     }
 
-    let clientOptions: LanguageClientOptions = {
+    const clientOptions: LanguageClientOptions = {
         documentSelector: [{scheme: 'file', language: 'rhai'}],
     }
 
@@ -28,7 +47,7 @@ function start_client() {
         clientOptions,
     )
 
-    client.start()
+    await client.start()
 }
 
 
@@ -63,11 +82,12 @@ async function installServerBinary(): Promise<boolean> {
             resolve(e.exitCode === 0)
         })
     })
-    vscode.tasks.executeTask(task)
+    await vscode.tasks.executeTask(task)
 
     return promise
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfiguration) {
     const selected = await vscode.window.showInformationMessage(
         'Install rhai-lsp-server (Rust toolchain required) ?',
@@ -77,10 +97,10 @@ async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfigu
     if (selected === 'Install') {
         const installed = await installServerBinary()
         if (installed) {
-            start_client()
+            await start_client()
         }
     } else if (selected === 'Never') {
-        configuration.update('useLanguageServer', false)
+        await configuration.update('useLanguageServer', false)
     }
 }
 
@@ -89,12 +109,42 @@ export async function activate(context: vscode.ExtensionContext) {
     const useLanguageServer = configuration.get<boolean>('useLanguageServer')
     const diagnostics = vscode.languages.createDiagnosticCollection('rhai-grain')
     context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, uri)))
+    context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document) => {
+        const config = getRhaiConfig(document)
+        const compileGrainOnSave = config.compileGrainOnSave
+        if (isRhaiDocument(document) && compileGrainOnSave === 'currentFile') {
+            await compileGrainHandler(diagnostics, document.uri)
+            await promptFileNesting(config, document)
+        }
+    }))
     const shouldStartClient = useLanguageServer && (await is_installed('rhai-lsp'))
     if (shouldStartClient) {
-        start_client()
+        await start_client()
     } else if (useLanguageServer) {
         // tryToInstallLanguageServer(configuration)
     }
+}
+
+async function promptFileNesting(configuration: RhaiConfig, document: vscode.TextDocument) {
+    const enabled = vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).get<boolean>('enabled', false)
+    if (!enabled && configuration.promptFileNesting && !askedNestingThisSession) {
+        const result = await vscode.window.showInformationMessage('Rhai: Would you like to enable file nesting so compiled `.rgrn` files nest under their `.rhai` source?', 'Enable', 'Not this time', 'Do not ask again')
+        if (result === 'Enable') {
+            if (vscode.workspace.workspaceFolders?.length) {
+                await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true,vscode.ConfigurationTarget.Workspace)
+            } else {
+                await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true, vscode.ConfigurationTarget.Global)
+            }
+        } else if (result === 'Do not ask again') {
+            await vscode.workspace.getConfiguration('rhai').update('promptFileNesting', false, vscode.ConfigurationTarget.Global)
+        }else {
+            askedNestingThisSession = true
+        }
+    }
+}
+
+function isRhaiDocument(document: vscode.TextDocument) {
+    return document.languageId === 'rhai' && document.uri.path.endsWith('.rhai')
 }
 
 async function compileGrainHandler(diagnostics: vscode.DiagnosticCollection, uri?: vscode.Uri) {
@@ -103,16 +153,16 @@ async function compileGrainHandler(diagnostics: vscode.DiagnosticCollection, uri
         return
     }
     try {
-        const bytes = grain.compile(document.getText())
-        diagnostics.delete(document.uri)
-        if (document.languageId !== 'rhai' || !document.uri.path.endsWith('.rhai')) {
+        if (!isRhaiDocument(document)) {
             await vscode.window.showWarningMessage('Rhai: open a .rhai file to compile it to Grain')
             return
         }
+        const bytes = grain.compile(document.getText())
+        diagnostics.delete(document.uri)
         await vscode.workspace.fs.writeFile(document.uri.with({path: document.uri.path.replace(/\.rhai$/, '.rgrn')}), bytes)
     } catch (error) {
         const e = error as { name?: string; message: string; line?: number; column?: number }
-        if ( e.name !== 'GrainError') {
+        if (e.name !== 'GrainError') {
             await vscode.window.showErrorMessage(`Rhai: ${e.message}`)
             return
         }
