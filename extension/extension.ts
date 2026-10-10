@@ -130,14 +130,14 @@ async function promptFileNesting(configuration: RhaiConfig, document: vscode.Tex
     if (!enabled && configuration.promptFileNesting && !askedNestingThisSession) {
         const result = await vscode.window.showInformationMessage('Rhai: Would you like to enable file nesting so compiled `.rgrn` files nest under their `.rhai` source?', 'Enable', 'Not this time', 'Do not ask again')
         if (result === 'Enable') {
-            if (vscode.workspace.workspaceFolders?.length !== 0) {
-                await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true)
+            if (vscode.workspace.workspaceFolders?.length) {
+                await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true,vscode.ConfigurationTarget.Workspace)
             } else {
                 await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true, vscode.ConfigurationTarget.Global)
             }
         } else if (result === 'Do not ask again') {
             await vscode.workspace.getConfiguration('rhai').update('promptFileNesting', false, vscode.ConfigurationTarget.Global)
-        } else {
+        }else {
             askedNestingThisSession = true
         }
     }
