@@ -8,9 +8,13 @@ test/**/*
 *.tgz
 **/*.ai
 yarn*
+eslint.config.mjs
 
 grain-wasm/**
 **/*.ts
 **/ts*.json
 BUILD.md
 **/*.vsix
+.github/**
+*.tsbuildinfo
+.idea/**

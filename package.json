@@ -24,6 +24,7 @@
         }
     },
     "scripts": {
+        "lint": "eslint extension",
         "build:ts": "tsc -b",
         "build": "npm run build:wasm && npm run build:ts",
         "build:wasm:cargo": "cargo build --release --target wasm32-unknown-unknown --manifest-path grain-wasm/Cargo.toml",
@@ -116,8 +117,12 @@
         "vscode-languageclient": "~10.1.2"
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
         "@types/node": "~26.6.0",
         "@types/vscode": "~1.79.0",
-        "@vscode/vsce": "^4.0.0"
+        "@vscode/vsce": "^4.0.0",
+        "eslint": "^10.12.0",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.71.1"
     }
 }

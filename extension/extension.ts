@@ -12,12 +12,12 @@ import
 
 let client: LanguageClient
 
-function start_client() {
-    let serverOptions: Executable = {
+async function start_client() {
+    const serverOptions: Executable = {
         command: 'rhai-lsp',
     }
 
-    let clientOptions: LanguageClientOptions = {
+    const clientOptions: LanguageClientOptions = {
         documentSelector: [{scheme: 'file', language: 'rhai'}],
     }
 
@@ -28,7 +28,7 @@ function start_client() {
         clientOptions,
     )
 
-    client.start()
+    await client.start()
 }
 
 
@@ -63,11 +63,12 @@ async function installServerBinary(): Promise<boolean> {
             resolve(e.exitCode === 0)
         })
     })
-    vscode.tasks.executeTask(task)
+    await vscode.tasks.executeTask(task)
 
     return promise
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfiguration) {
     const selected = await vscode.window.showInformationMessage(
         'Install rhai-lsp-server (Rust toolchain required) ?',
@@ -77,10 +78,10 @@ async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfigu
     if (selected === 'Install') {
         const installed = await installServerBinary()
         if (installed) {
-            start_client()
+            await start_client()
         }
     } else if (selected === 'Never') {
-        configuration.update('useLanguageServer', false)
+        await configuration.update('useLanguageServer', false)
     }
 }
 
@@ -91,7 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, uri)))
     const shouldStartClient = useLanguageServer && (await is_installed('rhai-lsp'))
     if (shouldStartClient) {
-        start_client()
+        await start_client()
     } else if (useLanguageServer) {
         // tryToInstallLanguageServer(configuration)
     }
