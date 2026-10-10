@@ -109,6 +109,22 @@
                     ],
                     "description": "Traces the communication between VS Code and the language server.",
                     "scope": "window"
+                },
+                "rhai.compileGrainOnSave": {
+                    "type": "string",
+                    "enum": ["off", "currentFile"],
+                    "markdownEnumDescriptions" : [
+                        "Do not compile Rhai files to Grain bytecode on save",
+                        "Compile only the current Rhai file to Grain bytecode on save"
+                    ],
+                    "default": "currentFile",
+                    "scope": "resource",
+                    "description": "Compile Rhai files to Grain bytecode on save"
+                },
+                "rhai.promptFileNesting": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Prompt to ask if the Rhai file nesting should be enabled, so compiled `.rgrn` files can nest under their `.rhai` source."
                 }
             }
         }
