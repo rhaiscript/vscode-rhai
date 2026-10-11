@@ -30,7 +30,6 @@ function getRhaiConfig(scope?: vscode.ConfigurationScope): RhaiConfig {
     }
 }
 
-
 async function start_client() {
     const serverOptions: Executable = {
         command: 'rhai-lsp',
