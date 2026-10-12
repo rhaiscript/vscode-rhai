@@ -25,7 +25,7 @@ function getRhaiConfig(scope?: vscode.ConfigurationScope): RhaiConfig {
     const c = vscode.workspace.getConfiguration('rhai', scope)
     return {
         useLanguageServer: c.get('useLanguageServer', true),
-        compileGrainOnSave: c.get('compileGrainOnSave', 'currentFile'),
+        compileGrainOnSave: c.get('compileGrainOnSave', 'off'),
         promptFileNesting: c.get('promptFileNesting', true),
     }
 }
