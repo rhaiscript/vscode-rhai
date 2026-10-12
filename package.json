@@ -117,7 +117,7 @@
                         "Do not compile Rhai files to Grain bytecode on save",
                         "Compile only the current Rhai file to Grain bytecode on save"
                     ],
-                    "default": "currentFile",
+                    "default": "off",
                     "scope": "resource",
                     "description": "Compile Rhai files to Grain bytecode on save"
                 },
