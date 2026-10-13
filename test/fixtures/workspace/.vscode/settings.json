@@ -1,0 +1,4 @@
+{
+    "rhai.compileGrainOnSave": "currentFile",
+    "rhai.useLanguageServer": false
+}

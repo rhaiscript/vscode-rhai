@@ -181,3 +181,8 @@ export function deactivate(): Thenable<void> | undefined {
     }
     return client.stop()
 }
+
+// Only used by the integration tests, which share this module instance with the extension host.
+export function resetSessionStateForTests() {
+    askedNestingThisSession = false
+}

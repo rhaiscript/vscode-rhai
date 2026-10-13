@@ -67,6 +67,36 @@ jobs:
         run: npm run build
       - name: ESLint
         run: npm run lint
+  npm-test:
+    name: NPM test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v7
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: grain-wasm
+      - name: Install wasm-bindgen
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@0.2.129
+      - name: Install node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: NPM install
+        run: npm i
+      - name: Build (wasm + TypeScript)
+        run: npm run build
+      - name: Integration tests
+        # xvfb-run -a for no display run test
+        run: xvfb-run -a npm run test:integration
 
   supply-chain:
     runs-on: ubuntu-latest

@@ -2,6 +2,9 @@
     "include": [
         "extension"
     ],
+    "exclude": [
+        "extension/test"
+    ],
     "compilerOptions": {
         "outDir": "dist",
         /* Basic Options */
