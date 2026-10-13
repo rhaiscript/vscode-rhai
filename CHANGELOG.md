@@ -1,3 +1,14 @@
+Version 0.7.0
+=============
+
+* Added Grain Bytecode Compiler support
+* Added compile on save for bytecode
+* Added inline Grain compilation errors in rhai files
+* Added bytecode file nested under rhai files
+* Added support for CICD
+* Added integration testing
+* Updated typescript dependencies
+
 Version 0.6.9
 =============
 
