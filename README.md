@@ -15,6 +15,10 @@ Features
 --------
 
 - [x] Syntax highlighting
+- [x] Grain bytecode compile
+  - [x] Compile on Save
+  - [x] Nested Grain bytecode file under Rhai files
+  - [x] Showing compilation Errors
 
 
 Todo List

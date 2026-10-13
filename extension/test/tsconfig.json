@@ -1,0 +1,19 @@
+{
+    // Test-only build: compiles the tests (and extension.ts, which they import) into dist/.
+    // Kept separate so Mocha's globals are only visible to test files, and so ESLint's
+    // projectService picks this config for files under extension/test.
+    "extends": "../../tsconfig.json",
+    "include": [
+        "."
+    ],
+    // The base config excludes extension/test; reset it so these files are included.
+    "exclude": [],
+    "compilerOptions": {
+        "rootDir": "..",
+        "outDir": "../../dist",
+        "types": [
+            "node",
+            "mocha"
+        ]
+    }
+}

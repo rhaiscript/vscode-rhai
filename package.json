@@ -30,6 +30,8 @@
         "build:wasm:cargo": "cargo build --release --target wasm32-unknown-unknown --manifest-path grain-wasm/Cargo.toml",
         "build:wasm:bindgen": "wasm-bindgen --target nodejs --out-dir dist/grain grain-wasm/target/wasm32-unknown-unknown/release/grain_wasm.wasm",
         "build:wasm": "npm run build:wasm:cargo && npm run build:wasm:bindgen",
+        "compile-tests": "tsc -p extension/test",
+        "test:integration": "npm run compile-tests && vscode-test",
         "pack": "npm run build && vsce package"
     },
     "main": "./dist/extension.js",
@@ -112,8 +114,11 @@
                 },
                 "rhai.compileGrainOnSave": {
                     "type": "string",
-                    "enum": ["off", "currentFile"],
-                    "markdownEnumDescriptions" : [
+                    "enum": [
+                        "off",
+                        "currentFile"
+                    ],
+                    "markdownEnumDescriptions": [
                         "Do not compile Rhai files to Grain bytecode on save",
                         "Compile only the current Rhai file to Grain bytecode on save"
                     ],
@@ -134,10 +139,15 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
+        "@types/mocha": "^10.0.10",
         "@types/node": "~26.6.0",
+        "@types/sinon": "^22.0.0",
         "@types/vscode": "~1.79.0",
+        "@vscode/test-cli": "^0.0.15",
+        "@vscode/test-electron": "^3.1.0",
         "@vscode/vsce": "^4.0.0",
         "eslint": "^10.12.0",
+        "sinon": "^22.1.0",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.71.1"
     }

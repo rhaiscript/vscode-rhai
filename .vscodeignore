@@ -1,6 +1,9 @@
 source/**/*
 images/**/*
 test/**/*
+dist/test/**
+.vscode-test/**
+.vscode-test.mjs
 
 .vscode
 .gitignore
