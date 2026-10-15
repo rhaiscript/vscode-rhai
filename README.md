@@ -35,6 +35,25 @@ How to Install
 
 - Download directly from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=rhaiscript.vscode-rhai).
 
+Commands
+--------------
+Use <kbd>Ctrl + P</kbd> or <kbd>Ctrl + Shift + P</kbd> to open the command palette and type `Rhai:`.
+
+| Command |  description |
+| --- | --- |
+| `rhai.compileGrain` | Compile Rhai current file to Grain bytecode |
+| `rhai.format` | Rhai: Format File |
+
+Settings
+--------------
+Use the Settings panel or <kbd>settings.json</kbd> in Visual Studio Code or <kbd>command</kbd> + <kbd>,</kbd> (Windows / Linux: File -> Preferences -> User Settings) open the vscode file `settings.json`
+
+| | type | default | description |
+| --- | --- | --- | --- |
+| `rhai.compileGrainOnSave`| string | `off` | Compile Rhai files to Grain bytecode on save |
+| `rhai.promptFileNesting` | boolean | `true` | Prompt to ask if the Rhai file nesting should be enabled, so compiled .rgrn files can nest under their .rhai source. |
+| `rhai.trace.server` | string | `off` | Traces the communication between VS Code and the language server. |
+| `rhai.useLanguageServer` | boolean | `true` | Use Rhai Language Server. (WIP) |
 
 Screenshot
 ----------
