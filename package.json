@@ -27,8 +27,8 @@
         "lint": "eslint extension",
         "build:ts": "tsc -b",
         "build": "npm run build:wasm && npm run build:ts",
-        "build:wasm:cargo": "cargo build --release --target wasm32-unknown-unknown --manifest-path grain-wasm/Cargo.toml",
-        "build:wasm:bindgen": "wasm-bindgen --target nodejs --out-dir dist/grain grain-wasm/target/wasm32-unknown-unknown/release/grain_wasm.wasm",
+        "build:wasm:cargo": "cargo build --release --target wasm32-unknown-unknown --manifest-path rhai-wasm/Cargo.toml",
+        "build:wasm:bindgen": "wasm-bindgen --target nodejs --out-dir dist/rhai rhai-wasm/target/wasm32-unknown-unknown/release/rhai_wasm.wasm",
         "build:wasm": "npm run build:wasm:cargo && npm run build:wasm:bindgen",
         "compile-tests": "tsc -p extension/test",
         "test:integration": "npm run compile-tests && vscode-test",
@@ -130,6 +130,26 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Prompt to ask if the Rhai file nesting should be enabled, so compiled `.rgrn` files can nest under their `.rhai` source."
+                },
+                "rhai.syntaxCheckRhaiOnSave": {
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "currentFile"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Do not check Rhai file syntax on save",
+                        "Check only the current Rhai file on save"
+                    ],
+                    "default": "off",
+                    "scope": "resource",
+                    "description": "Syntax check for Rhai file after typing stops"
+                },
+                "rhai.syntaxCheckRhaiDelaySeconds": {
+                    "type": "number",
+                    "default": 3,
+                    "scope": "resource",
+                    "description": "Seconds to wait after typing stops before checking for Rhai parse errors. Temporary until `rhai-lsp` lands."
                 }
             }
         }

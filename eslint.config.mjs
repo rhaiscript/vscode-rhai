@@ -4,7 +4,7 @@ import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
-    { ignores: ['dist/**', 'grain-wasm/**'] },
+    { ignores: ['dist/**', 'rhai-wasm/**'] },
     {
         files: ['extension/**/*.ts'],
         extends: [js.configs.recommended, tseslint.configs.recommendedTypeChecked],

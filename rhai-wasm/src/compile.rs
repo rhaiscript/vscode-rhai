@@ -1,20 +1,26 @@
-use crate::error::GrainError;
+use crate::error::RhaiError;
 use rhai::Engine;
 use rhai::grain::Compiler;
 
-pub(crate) fn compile_source(source: &str) -> Result<Vec<u8>, GrainError> {
+pub(crate) fn compile_grain_byte_code(source: &str) -> Result<Vec<u8>, RhaiError> {
     let engine = Engine::new();
     let ast = engine.compile(source)?;
     let program = Compiler::new().compile(&ast);
     let buf = program
         .write()
-        .map_err(|e| GrainError::new(format!("failed to write program: {e}"), None, None))?;
+        .map_err(|e| RhaiError::new(format!("failed to write program: {e}"), None, None))?;
     Ok(buf)
+}
+
+pub(crate) fn compile_rhai(source: &str) -> Result<(), RhaiError> {
+    let engine = Engine::new();
+    let _ = engine.compile(source)?;
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use super::compile_source;
+    use super::compile_grain_byte_code;
     use rhai::Engine;
     use rhai::grain::{Program, Vm};
     use std::path::{Path, PathBuf};
@@ -51,7 +57,7 @@ mod tests {
 
     #[test]
     fn compiles_to_a_readable_program() {
-        let bytes = compile_source("let x = 40; x + 2").unwrap();
+        let bytes = compile_grain_byte_code("let x = 40; x + 2").unwrap();
 
         assert!(!bytes.is_empty());
         Program::read(&bytes).expect("written program reads back");
@@ -59,14 +65,14 @@ mod tests {
 
     #[test]
     fn empty_script_compiles() {
-        let bytes = compile_source("").unwrap();
+        let bytes = compile_grain_byte_code("").unwrap();
 
         Program::read(&bytes).expect("empty program reads back");
     }
 
     #[test]
     fn syntax_error_is_rejected() {
-        assert!(compile_source("let = ;").is_err());
+        assert!(compile_grain_byte_code("let = ;").is_err());
     }
 
     /// The bytecode must mean the same as the script: run both and compare.
@@ -89,7 +95,7 @@ mod tests {
                 .unwrap_or_else(|e| panic!("AST eval of `{source}`: {e}"));
 
             let bytes =
-                compile_source(source).unwrap_or_else(|e| panic!("compile `{source}`: {e:?}"));
+                compile_grain_byte_code(source).unwrap_or_else(|e| panic!("compile `{source}`: {e:?}"));
             let program =
                 Program::read(&bytes).unwrap_or_else(|e| panic!("read `{source}`: {e:?}"));
             let actual = Vm::new(&engine)
@@ -103,7 +109,7 @@ mod tests {
     }
     fn compare_and_read(path: &PathBuf) -> Result<(), String> {
         let source = std::fs::read_to_string(path).unwrap();
-        compile_source(&source)
+        compile_grain_byte_code(&source)
             .map_err(|e| format!("compile: {e:?}"))
             .and_then(|bytes| {
                 Program::read(&bytes)

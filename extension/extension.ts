@@ -1,6 +1,6 @@
-import * as vscode from 'vscode'
 import * as child_process from 'child_process'
-import * as grain from '../dist/grain/grain_wasm.js'
+import {compileRhaiHandler, compileGrainHandler, isRhaiDocument} from "./handlers"
+import * as vscode from "vscode";
 
 import
 {
@@ -12,12 +12,16 @@ import
 
 let client: LanguageClient
 let askedNestingThisSession: boolean = false
+let syntaxCheckRhaiTimeout: NodeJS.Timeout | undefined = undefined;
 
-type CompileOnSave = 'off' | 'currentFile';
+type CompileGrainOnSave = 'off' | 'currentFile';
+type SyntaxCheckRhaiOnSave = 'off' | 'currentFile';
 
 interface RhaiConfig {
     useLanguageServer: boolean
-    compileGrainOnSave: CompileOnSave,
+    compileGrainOnSave: CompileGrainOnSave,
+    syntaxCheckRhaiOnSave: SyntaxCheckRhaiOnSave,
+    syntaxCheckRhaiDelaySeconds: number,
     promptFileNesting: boolean,
 }
 
@@ -26,6 +30,8 @@ function getRhaiConfig(scope?: vscode.ConfigurationScope): RhaiConfig {
     return {
         useLanguageServer: c.get('useLanguageServer', true),
         compileGrainOnSave: c.get('compileGrainOnSave', 'off'),
+        syntaxCheckRhaiOnSave: c.get('syntaxCheckRhaiOnSave', 'off'),
+        syntaxCheckRhaiDelaySeconds: c.get('syntaxCheckRhaiDelaySeconds', 3),
         promptFileNesting: c.get('promptFileNesting', true),
     }
 }
@@ -108,6 +114,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const useLanguageServer = configuration.get<boolean>('useLanguageServer')
     const diagnostics = vscode.languages.createDiagnosticCollection('rhai-grain')
     context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, uri)))
+    context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, uri)))
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document) => {
         const config = getRhaiConfig(document)
         const compileGrainOnSave = config.compileGrainOnSave
@@ -115,6 +122,18 @@ export async function activate(context: vscode.ExtensionContext) {
             await compileGrainHandler(diagnostics, document.uri)
             await promptFileNesting(config, document)
         }
+    }))
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(async (docsChangeEvent: vscode.TextDocumentChangeEvent) => {
+        const config = getRhaiConfig(docsChangeEvent.document)
+        const timeout = config.syntaxCheckRhaiDelaySeconds;
+        if (syntaxCheckRhaiTimeout) {
+            clearTimeout(syntaxCheckRhaiTimeout)
+        }
+        syntaxCheckRhaiTimeout = setTimeout(
+            async () => {
+                await compileRhaiHandler(diagnostics, docsChangeEvent.document.uri)
+            }, timeout,
+        )
     }))
     const shouldStartClient = useLanguageServer && (await is_installed('rhai-lsp'))
     if (shouldStartClient) {
@@ -142,38 +161,7 @@ async function promptFileNesting(configuration: RhaiConfig, document: vscode.Tex
     }
 }
 
-function isRhaiDocument(document: vscode.TextDocument) {
-    return document.languageId === 'rhai' && document.uri.path.endsWith('.rhai')
-}
 
-async function compileGrainHandler(diagnostics: vscode.DiagnosticCollection, uri?: vscode.Uri) {
-    const document = uri ? await vscode.workspace.openTextDocument(uri) : vscode.window.activeTextEditor?.document
-    if (!document) {
-        return
-    }
-    try {
-        if (!isRhaiDocument(document)) {
-            await vscode.window.showWarningMessage('Rhai: open a .rhai file to compile it to Grain')
-            return
-        }
-        const bytes = grain.compile(document.getText())
-        diagnostics.delete(document.uri)
-        await vscode.workspace.fs.writeFile(document.uri.with({path: document.uri.path.replace(/\.rhai$/, '.rgrn')}), bytes)
-    } catch (error) {
-        const e = error as { name?: string; message: string; line?: number; column?: number }
-        if (e.name !== 'GrainError') {
-            await vscode.window.showErrorMessage(`Rhai: ${e.message}`)
-            return
-        }
-        const line = (e.line ?? 1) - 1
-        const col = (e.column ?? 1) - 1
-        const range = new vscode.Range(line, col, line, col + 1)
-        diagnostics.set(document.uri, [
-            new vscode.Diagnostic(range, e.message, vscode.DiagnosticSeverity.Error),
-        ])
-        console.error(error)
-    }
-}
 
 export function deactivate(): Thenable<void> | undefined {
     if (!client) {

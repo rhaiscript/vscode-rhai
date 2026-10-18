@@ -13,7 +13,7 @@ dist/test/**
 yarn*
 eslint.config.mjs
 
-grain-wasm/**
+rhai-wasm/**
 **/*.ts
 **/ts*.json
 BUILD.md
