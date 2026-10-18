@@ -20,7 +20,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: grain-wasm
+        working-directory: rhai-wasm
     steps:
       - name: Checkout the code
         uses: actions/checkout@v7
@@ -52,7 +52,7 @@ jobs:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: grain-wasm
+          workspaces: rhai-wasm
       - name: Install wasm-bindgen
         uses: taiki-e/install-action@v2
         with:
@@ -81,7 +81,7 @@ jobs:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: grain-wasm
+          workspaces: rhai-wasm
       - name: Install wasm-bindgen
         uses: taiki-e/install-action@v2
         with:
@@ -104,7 +104,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: grain-wasm
+        working-directory: rhai-wasm
     steps:
       - name: Checkout the code
         uses: actions/checkout@v7
@@ -123,7 +123,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: grain-wasm
+        working-directory: rhai-wasm
     steps:
       - name: Checkout the code
         uses: actions/checkout@v7

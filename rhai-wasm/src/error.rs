@@ -2,15 +2,15 @@ use rhai::ParseError;
 use wasm_bindgen::JsValue;
 
 #[derive(Debug)]
-pub(crate) struct GrainError {
+pub(crate) struct RhaiError {
     error_message: String,
     line: Option<usize>,
     column: Option<usize>,
 }
 
-impl GrainError {
+impl RhaiError {
     pub fn new(error_message: String, line: Option<usize>, column: Option<usize>) -> Self {
-        GrainError {
+        RhaiError {
             error_message,
             line,
             column,
@@ -18,9 +18,9 @@ impl GrainError {
     }
 }
 
-impl From<ParseError> for GrainError {
+impl From<ParseError> for RhaiError {
     fn from(err: ParseError) -> Self {
-        GrainError {
+        RhaiError {
             error_message: err.err_type().to_string(),
             line: err.position().line(),
             column: err.position().position(),
@@ -28,10 +28,10 @@ impl From<ParseError> for GrainError {
     }
 }
 
-impl From<GrainError> for JsValue {
-    fn from(err: GrainError) -> Self {
+impl From<RhaiError> for JsValue {
+    fn from(err: RhaiError) -> Self {
         let js_err = js_sys::Error::new(&err.error_message);
-        js_err.set_name("GrainError");
+        js_err.set_name("RhaiError");
 
         for (key, value) in [("line", err.line), ("column", err.column)] {
             if let Some(n) = value {
@@ -45,10 +45,10 @@ impl From<GrainError> for JsValue {
 
 #[cfg(test)]
 mod tests {
-    use super::GrainError;
+    use super::RhaiError;
     use rhai::Engine;
 
-    fn parse_error(source: &str) -> GrainError {
+    fn parse_error(source: &str) -> RhaiError {
         Engine::new().compile(source).unwrap_err().into()
     }
 
