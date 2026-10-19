@@ -16,7 +16,7 @@ export async function compileRhaiHandler(diagnostics: vscode.DiagnosticCollectio
         diagnostics.delete(document.uri);
     } catch (error) {
         const e = error as { name?: string; message: string; line?: number; column?: number }
-        await squigglyLineError(e,document, diagnostics, uri, )
+        await squigglyLineError(e,document, diagnostics, )
     }
 }
 
@@ -35,7 +35,7 @@ export async function compileGrainHandler(diagnostics: vscode.DiagnosticCollecti
         await vscode.workspace.fs.writeFile(document.uri.with({path: document.uri.path.replace(/\.rhai$/, '.rgrn')}), bytes)
     } catch (error) {
         const e = error as { name?: string; message: string; line?: number; column?: number }
-        await squigglyLineError(e,document, diagnostics, uri, )
+        await squigglyLineError(e,document, diagnostics,)
     }
 }
 

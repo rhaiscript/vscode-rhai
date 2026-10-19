@@ -94,8 +94,8 @@ mod tests {
                 .eval::<i64>(source)
                 .unwrap_or_else(|e| panic!("AST eval of `{source}`: {e}"));
 
-            let bytes =
-                compile_grain_byte_code(source).unwrap_or_else(|e| panic!("compile `{source}`: {e:?}"));
+            let bytes = compile_grain_byte_code(source)
+                .unwrap_or_else(|e| panic!("compile `{source}`: {e:?}"));
             let program =
                 Program::read(&bytes).unwrap_or_else(|e| panic!("read `{source}`: {e:?}"));
             let actual = Vm::new(&engine)

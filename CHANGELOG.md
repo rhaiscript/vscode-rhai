@@ -1,3 +1,8 @@
+Version 0.7.1
+=============
+
+* Added bare metal syntax check on rhai files support.
+
 Version 0.7.0
 =============
 

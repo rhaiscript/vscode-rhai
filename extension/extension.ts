@@ -15,12 +15,12 @@ let askedNestingThisSession: boolean = false
 let syntaxCheckRhaiTimeout: NodeJS.Timeout | undefined = undefined;
 
 type CompileGrainOnSave = 'off' | 'currentFile';
-type SyntaxCheckRhaiOnSave = 'off' | 'currentFile';
+type SyntaxCheckRhaiOnChange = 'off' | 'currentFile';
 
 interface RhaiConfig {
     useLanguageServer: boolean
     compileGrainOnSave: CompileGrainOnSave,
-    syntaxCheckRhaiOnSave: SyntaxCheckRhaiOnSave,
+    syntaxCheckRhaiOnChange: SyntaxCheckRhaiOnChange,
     syntaxCheckRhaiDelaySeconds: number,
     promptFileNesting: boolean,
 }
@@ -30,7 +30,7 @@ function getRhaiConfig(scope?: vscode.ConfigurationScope): RhaiConfig {
     return {
         useLanguageServer: c.get('useLanguageServer', true),
         compileGrainOnSave: c.get('compileGrainOnSave', 'off'),
-        syntaxCheckRhaiOnSave: c.get('syntaxCheckRhaiOnSave', 'off'),
+        syntaxCheckRhaiOnChange: c.get('syntaxCheckRhaiOnChange', 'off'),
         syntaxCheckRhaiDelaySeconds: c.get('syntaxCheckRhaiDelaySeconds', 3),
         promptFileNesting: c.get('promptFileNesting', true),
     }
@@ -112,7 +112,7 @@ async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfigu
 export async function activate(context: vscode.ExtensionContext) {
     const configuration = vscode.workspace.getConfiguration('rhai')
     const useLanguageServer = configuration.get<boolean>('useLanguageServer')
-    const diagnostics = vscode.languages.createDiagnosticCollection('rhai-grain')
+    const diagnostics = vscode.languages.createDiagnosticCollection('rhai')
     context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, uri)))
     context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, uri)))
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document) => {
@@ -123,17 +123,20 @@ export async function activate(context: vscode.ExtensionContext) {
             await promptFileNesting(config, document)
         }
     }))
-    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(async (docsChangeEvent: vscode.TextDocumentChangeEvent) => {
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument( (docsChangeEvent: vscode.TextDocumentChangeEvent) => {
         const config = getRhaiConfig(docsChangeEvent.document)
-        const timeout = config.syntaxCheckRhaiDelaySeconds;
-        if (syntaxCheckRhaiTimeout) {
-            clearTimeout(syntaxCheckRhaiTimeout)
+        const timeoutSecs = config.syntaxCheckRhaiDelaySeconds;
+        const syntaxCheckRhaiOnChange = config.syntaxCheckRhaiOnChange
+        if (isRhaiDocument(docsChangeEvent.document) && syntaxCheckRhaiOnChange === 'currentFile') {
+            if (syntaxCheckRhaiTimeout) {
+                clearTimeout(syntaxCheckRhaiTimeout)
+            }
+            syntaxCheckRhaiTimeout = setTimeout(
+                 () => {
+                     void compileRhaiHandler(diagnostics, docsChangeEvent.document.uri)
+                }, timeoutSecs * 1000,
+            )
         }
-        syntaxCheckRhaiTimeout = setTimeout(
-            async () => {
-                await compileRhaiHandler(diagnostics, docsChangeEvent.document.uri)
-            }, timeout,
-        )
     }))
     const shouldStartClient = useLanguageServer && (await is_installed('rhai-lsp'))
     if (shouldStartClient) {

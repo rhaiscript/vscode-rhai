@@ -37,12 +37,13 @@ How to Install
 
 Commands
 --------------
-Use <kbd>Ctrl + P</kbd> or <kbd>Ctrl + Shift + P</kbd> to open the command palette and type `Rhai:`.
+Use <kbd>Ctrl + Shift + P</kbd> or <kbd>Command + Shift + P</kbd> to open the command palette and type `Rhai:`.
 
 | Command |  description |
 | --- | --- |
 | `rhai.compileGrain` | Compile Rhai current file to Grain bytecode |
 | `rhai.format` | Rhai: Format File |
+| `rhai.syntaxCheckRhai` | Rhai: Syntax check on current Rhai file |
 
 Settings
 --------------
@@ -53,6 +54,8 @@ Use the Settings panel or <kbd>settings.json</kbd> in Visual Studio Code or <kbd
 | `rhai.compileGrainOnSave`| string | `off` | Compile Rhai files to Grain bytecode on save |
 | `rhai.promptFileNesting` | boolean | `true` | Prompt to ask if the Rhai file nesting should be enabled, so compiled .rgrn files can nest under their .rhai source. |
 | `rhai.trace.server` | string | `off` | Traces the communication between VS Code and the language server. |
+| `rhai.syntaxCheckRhaiOnChange` | string | `off` | Enable syntax check on Rhai file on file change. |
+| `rhai.syntaxCheckRhaiDelaySeconds` | number | `3` | Seconds to wait after typing stops before running syntax check. |
 | `rhai.useLanguageServer` | boolean | `true` | Use Rhai Language Server. (WIP) |
 
 Screenshot
