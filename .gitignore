@@ -1,5 +1,6 @@
 # IDEs
-.vscode
+.vscode/*
+!.vscode/launch.json
 # allow the settings of the integration-test fixture workspace
 !test/fixtures/workspace/.vscode/
 .idea
@@ -12,6 +13,9 @@ dist/
 yarn.lock
 yarn-error.log
 *.tsbuildinfo
+
+# Rhai
+*.rgrn
 
 # Integration tests
 .vscode-test/

@@ -91,6 +91,10 @@
             {
                 "command": "rhai.compileGrain",
                 "title": "Rhai: Compile to Grain bytecode"
+            },
+            {
+                "command": "rhai.syntaxCheckRhai",
+                "title": "Rhai: Syntax Check"
             }
         ],
         "configuration": {
@@ -131,15 +135,15 @@
                     "default": true,
                     "markdownDescription": "Prompt to ask if the Rhai file nesting should be enabled, so compiled `.rgrn` files can nest under their `.rhai` source."
                 },
-                "rhai.syntaxCheckRhaiOnSave": {
+                "rhai.syntaxCheckRhaiOnChange": {
                     "type": "string",
                     "enum": [
                         "off",
                         "currentFile"
                     ],
                     "markdownEnumDescriptions": [
-                        "Do not check Rhai file syntax on save",
-                        "Check only the current Rhai file on save"
+                        "Do not check Rhai file syntax on change",
+                        "Check only the current Rhai file on change"
                     ],
                     "default": "off",
                     "scope": "resource",
