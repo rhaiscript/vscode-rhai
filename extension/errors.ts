@@ -7,7 +7,7 @@ export async function squigglyLineError(error: {
                                             message: string;
                                             line?: number;
                                             column?: number
-                                        }, document: vscode.TextDocument, diagnostics: vscode.DiagnosticCollection, uri?: vscode.Uri,
+                                        }, document: vscode.TextDocument, diagnostics: vscode.DiagnosticCollection
 ) {
     if (error.name !== rhaiErrorName) {
         await vscode.window.showErrorMessage(`Rhai: ${error.message}`)
