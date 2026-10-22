@@ -145,7 +145,7 @@
                         "Do not check Rhai file syntax on change",
                         "Check only the current Rhai file on change"
                     ],
-                    "default": "off",
+                    "default": "currentFile",
                     "scope": "resource",
                     "description": "Syntax check for Rhai file after typing stops"
                 },

@@ -30,7 +30,7 @@ function getRhaiConfig(scope?: vscode.ConfigurationScope): RhaiConfig {
     return {
         useLanguageServer: c.get('useLanguageServer', true),
         compileGrainOnSave: c.get('compileGrainOnSave', 'off'),
-        syntaxCheckRhaiOnChange: c.get('syntaxCheckRhaiOnChange', 'off'),
+        syntaxCheckRhaiOnChange: c.get('syntaxCheckRhaiOnChange', 'currentFile'),
         syntaxCheckRhaiDelaySeconds: c.get('syntaxCheckRhaiDelaySeconds', 3),
         promptFileNesting: c.get('promptFileNesting', true),
     }

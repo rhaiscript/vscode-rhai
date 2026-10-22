@@ -102,6 +102,18 @@ suite('Rhai syntax check while typing', () => {
         assert.deepStrictEqual(diagnosticsFor(document.uri), [])
     })
 
+    test('the check is on by default when rhai.syntaxCheckRhaiOnChange is not set', async () => {
+        // Remove the value `setup` wrote, so only the default from package.json applies.
+        await h.updateSetting('rhai', 'syntaxCheckRhaiOnChange', undefined, vscode.ConfigurationTarget.Workspace)
+        const setting = vscode.workspace.getConfiguration('rhai').inspect('syntaxCheckRhaiOnChange')
+        assert.strictEqual(setting?.defaultValue, 'currentFile')
+        assert.strictEqual(setting?.globalValue, undefined)
+        assert.strictEqual(setting?.workspaceValue, undefined)
+
+        const {document} = await h.openRhai(file, INVALID)
+        await h.waitFor(() => diagnosticsFor(document.uri).length > 0, 'a syntax diagnostic with the default setting')
+    })
+
     test('non-Rhai documents are never checked', async () => {
         const {document} = await h.openRhai(h.freshName('note', '.txt'), INVALID)
         assert.notStrictEqual(document.languageId, 'rhai')
