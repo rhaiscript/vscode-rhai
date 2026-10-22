@@ -131,7 +131,7 @@ export async function closeAllEditors(): Promise<void> {
 const TOUCHED_SETTINGS: {section: string, key: string, workspaceValue: unknown}[] = [
     {section: 'rhai', key: 'compileGrainOnSave', workspaceValue: 'currentFile'},
     {section: 'rhai', key: 'promptFileNesting', workspaceValue: undefined},
-    {section: 'rhai', key: 'syntaxCheckRhaiOnChange', workspaceValue: undefined},
+    {section: 'rhai', key: 'syntaxCheckRhaiOnChange', workspaceValue: 'off'},
     {section: 'rhai', key: 'syntaxCheckRhaiDelaySeconds', workspaceValue: undefined},
     {section: 'explorer.fileNesting', key: 'enabled', workspaceValue: undefined},
 ]
