@@ -1,4 +1,4 @@
-use rhai::ParseError;
+use rhai::{ParseError, Position};
 use wasm_bindgen::JsValue;
 
 #[derive(Debug)]
@@ -6,6 +6,8 @@ pub(crate) struct RhaiError {
     error_message: String,
     line: Option<usize>,
     column: Option<usize>,
+    end_line: Option<usize>,
+    end_column: Option<usize>,
 }
 
 impl RhaiError {
@@ -14,7 +16,45 @@ impl RhaiError {
             error_message,
             line,
             column,
+            end_line: None,
+            end_column: None,
         }
+    }
+
+    pub fn current_token_len(
+        source: &str,
+        start_pos: Position,
+        next_pos: Position,
+    ) -> Option<usize> {
+        // one based
+        let start_line = start_pos.line()? - 1;
+        let start_col = start_pos.position()? - 1;
+
+        let line_text = source.lines().nth(start_line)?;
+        let line_char_len = line_text.chars().count();
+
+        let stop_col = match (next_pos.line(), next_pos.position()) {
+            (None, _) | (_, None) => return None,
+            (Some(next_line_number), Some(next_column)) if next_line_number - 1 == start_line => {
+                (next_column - 1).min(line_char_len)
+            }
+            _ => line_char_len,
+        };
+
+        let current_token_text: String = line_text
+            .chars()
+            .skip(start_col)
+            .take(stop_col.saturating_sub(start_col))
+            .collect();
+
+        let current_token_len = current_token_text.trim_end().chars().count().max(1);
+
+        Some(start_col + current_token_len + 1)
+    }
+
+    pub fn set_end_position(&mut self, end_line: Option<usize>, end_column: Option<usize>) {
+        self.end_line = end_line;
+        self.end_column = end_column;
     }
 }
 
@@ -24,6 +64,8 @@ impl From<ParseError> for RhaiError {
             error_message: err.err_type().to_string(),
             line: err.position().line(),
             column: err.position().position(),
+            end_line: None,
+            end_column: None,
         }
     }
 }

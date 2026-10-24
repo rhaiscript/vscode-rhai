@@ -1,6 +1,6 @@
 use crate::error::RhaiError;
 use rhai::grain::Compiler;
-use rhai::{Engine, Token};
+use rhai::{Engine, LexError, Position, Token};
 
 pub(crate) fn compile_grain_byte_code(source: &str) -> Result<Vec<u8>, RhaiError> {
     let engine = Engine::new();
@@ -18,11 +18,20 @@ pub(crate) fn compile_rhai(source: &str) -> Vec<RhaiError> {
     let (stream, tc) = engine.lex(&scripts);
     let mut interpolations: Vec<usize> = Vec::new();
     let mut errors = Vec::new();
+    let mut pending_error: Option<(Box<LexError>, Position)> = None;
     for (token, pos) in stream {
+        if let Some((err, prev_pos)) = pending_error.take() {
+            let mut rhai_err =
+                RhaiError::new(err.to_string(), prev_pos.line(), prev_pos.position());
+            if let Some(end_col) = RhaiError::current_token_len(source, prev_pos, pos) {
+                rhai_err.set_end_position(prev_pos.line(), Some(end_col));
+            }
+            errors.push(rhai_err);
+        }
         match token {
             Token::EOF => break,
             Token::LexError(err) => {
-                errors.push(RhaiError::new(err.to_string(), pos.line(), pos.position()));
+                pending_error = Some((err, pos));
             }
             Token::InterpolatedString(_) => interpolations.push(0),
             Token::LeftBrace | Token::MapStart => {
@@ -190,12 +199,19 @@ mod tests {
         );
     }
 
-    /// Asserts the exact errors (message, 1-based line, 1-based column) reported for `source`.
-    fn assert_errors(source: &str, expected: &[(&str, usize, usize)]) {
+    /// Asserts the exact errors reported for `source`, as
+    /// `(message, line, column, end column)`. Lines and columns are 1-based and the end column
+    /// is exclusive. Lexer errors sit on one line, so the end shares the start's line; parse
+    /// errors carry no end and use `None`.
+    fn assert_errors(source: &str, expected: &[(&str, usize, usize, Option<usize>)]) {
         let expected: Vec<RhaiError> = expected
             .iter()
-            .map(|&(message, line, column)| {
-                RhaiError::new(message.to_string(), Some(line), Some(column))
+            .map(|&(message, line, column, end_column)| {
+                let mut err = RhaiError::new(message.to_string(), Some(line), Some(column));
+                if let Some(end_column) = end_column {
+                    err.set_end_position(Some(line), Some(end_column));
+                }
+                err
             })
             .collect();
         assert_eq!(
@@ -268,7 +284,7 @@ mod tests {
     fn code_after_an_interpolated_string_is_lexed_as_code() {
         assert_errors(
             "let s = `${1}`;\nlet t = \"abc",
-            &[("Open string is not terminated", 2, 9)],
+            &[("Open string is not terminated", 2, 9, Some(13))],
         );
     }
 
@@ -286,12 +302,18 @@ mod tests {
 
     #[test]
     fn unterminated_double_quoted_string() {
-        assert_errors("let s = \"abc", &[("Open string is not terminated", 1, 9)]);
+        assert_errors(
+            "let s = \"abc",
+            &[("Open string is not terminated", 1, 9, Some(13))],
+        );
     }
 
     #[test]
     fn unterminated_back_tick_string() {
-        assert_errors("let s = `abc", &[("Open string is not terminated", 1, 9)]);
+        assert_errors(
+            "let s = `abc",
+            &[("Open string is not terminated", 1, 9, Some(13))],
+        );
     }
 
     #[test]
@@ -303,7 +325,7 @@ mod tests {
     fn invalid_escape_sequence() {
         assert_errors(
             "let s = \"\\q\";",
-            &[("Invalid escape sequence: '\\q'", 1, 11)],
+            &[("Invalid escape sequence: '\\q'", 1, 11, None)],
         );
     }
 
@@ -316,7 +338,7 @@ mod tests {
     fn error_position_on_a_later_line() {
         assert_errors(
             "let x = 1;\nlet s = \"abc",
-            &[("Open string is not terminated", 2, 9)],
+            &[("Open string is not terminated", 2, 9, Some(13))],
         );
     }
 
@@ -326,14 +348,62 @@ mod tests {
         assert_errors(
             "let a = \"x\nlet b = \"y",
             &[
-                ("Open string is not terminated", 1, 9),
-                ("Open string is not terminated", 2, 9),
+                ("Open string is not terminated", 1, 9, Some(11)),
+                ("Open string is not terminated", 2, 9, Some(11)),
             ],
         );
     }
 
     #[test]
     fn grammar_error_is_reported() {
-        assert_errors("let x = ;", &[("Unexpected ';'", 1, 9)]);
+        assert_errors("let x = ;", &[("Unexpected ';'", 1, 9, None)]);
+    }
+
+    // --- end of the underlined range ---------------------------------------------------
+
+    #[test]
+    fn invalid_operator_range_excludes_the_following_space() {
+        // The next token `1` starts at column 15; the space before it is not part of `===`.
+        assert_errors(
+            "let a = 1 === 1;",
+            &[(
+                "'===' is not a valid operator. This is not JavaScript! Should it be '=='?",
+                1,
+                11,
+                Some(14),
+            )],
+        );
+    }
+
+    #[test]
+    fn invalid_character_literal_range_ends_at_the_next_token() {
+        assert_errors(
+            "let c = 'ab';",
+            &[("Invalid character: 'ab'", 1, 9, Some(13))],
+        );
+    }
+
+    #[test]
+    fn unexpected_character_range_covers_only_that_character() {
+        assert_errors("let x = 1 £ 2;", &[("Unexpected '£'", 1, 11, Some(12))]);
+    }
+
+    #[test]
+    fn unterminated_string_range_stays_on_its_own_line() {
+        // The next token is on line 2 (and rhai misreports its line after this error),
+        // so the end must be the end of line 1.
+        assert_errors(
+            "let s = \"abc\nlet y = 1;",
+            &[("Open string is not terminated", 1, 9, Some(13))],
+        );
+    }
+
+    #[test]
+    fn range_is_counted_in_characters_not_bytes() {
+        // `£` is two bytes but one character; counting bytes would give 14.
+        assert_errors(
+            "let s = \"£bc",
+            &[("Open string is not terminated", 1, 9, Some(13))],
+        );
     }
 }
