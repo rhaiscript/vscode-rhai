@@ -85,7 +85,11 @@ mod tests {
         }
         // `read_dir` order is platform-dependent; keep failure output stable.
         files.sort();
-        assert!(!files.is_empty(), "no .rhai fixtures found in {}", rhai_scripts_path.display());
+        assert!(
+            !files.is_empty(),
+            "no .rhai fixtures found in {}",
+            rhai_scripts_path.display()
+        );
         files
     }
 
@@ -194,7 +198,11 @@ mod tests {
                 RhaiError::new(message.to_string(), Some(line), Some(column))
             })
             .collect();
-        assert_eq!(syntax_errors(source), format!("{expected:?}"), "for source: {source:?}");
+        assert_eq!(
+            syntax_errors(source),
+            format!("{expected:?}"),
+            "for source: {source:?}"
+        );
     }
 
     fn assert_no_errors(source: &str) {
@@ -204,7 +212,10 @@ mod tests {
     /// For errors whose exact text or position isn't worth pinning down.
     fn assert_error_contains(source: &str, fragment: &str) {
         let errors = syntax_errors(source);
-        assert!(errors.contains(fragment), "expected {fragment:?} for {source:?}, got {errors}");
+        assert!(
+            errors.contains(fragment),
+            "expected {fragment:?} for {source:?}, got {errors}"
+        );
     }
 
     #[test]
