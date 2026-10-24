@@ -10,6 +10,9 @@ pub fn compile_grain(source: &str) -> Result<Vec<u8>, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn compile(source: &str) -> Result<(), JsValue> {
-    Ok(compile_rhai(source)?)
+pub fn compile(source: &str) -> Vec<JsValue> {
+    compile_rhai(source)
+        .into_iter()
+        .map(JsValue::from)
+        .collect()
 }
