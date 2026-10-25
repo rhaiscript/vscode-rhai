@@ -43,6 +43,20 @@ suite('Rhai syntax check while typing', () => {
         await h.deleteCreatedFiles()
     })
 
+    /** Opens `source` and runs the syntax check once through the command, with no debounce involved. */
+    async function checkNow(source: string): Promise<vscode.Diagnostic[]> {
+        await useSyntaxCheck('off')
+        const {document} = await h.openRhai(file, source)
+        await vscode.commands.executeCommand('rhai.syntaxCheckRhai')
+        return diagnosticsFor(document.uri)
+    }
+
+    /** `[message, 0-based line, 0-based character]` for each diagnostic, for compact assertions. */
+    function summarise(diagnostics: vscode.Diagnostic[]): [string, number, number][] {
+        return diagnostics.map((d) => [d.message, d.range.start.line, d.range.start.character])
+    }
+
+
     test('invalid Rhai is reported after typing stops, without saving', async () => {
         const {document} = await h.openRhai(file, INVALID)
 
@@ -120,6 +134,80 @@ suite('Rhai syntax check while typing', () => {
 
         await h.sleep(DELAY_SECONDS * 1000 + 500)
         assert.deepStrictEqual(diagnosticsFor(document.uri), [])
+    })
+
+
+    /** `[start line, start character, end line, end character]`, all 0-based like VS Code. */
+    function rangeOf(diagnostic: vscode.Diagnostic): [number, number, number, number] {
+        const {start, end} = diagnostic.range
+        return [start.line, start.character, end.line, end.character]
+    }
+
+    test('a lexer error underlines the whole token, not just its first character', async () => {
+        const [diagnostic] = await checkNow('let a = 1 === 1;')
+        // rhai: column 11 to 14 (1-based, exclusive end) -> VS Code: character 10 to 13.
+        assert.deepStrictEqual(rangeOf(diagnostic), [0, 10, 0, 13])
+    })
+
+    test('a parser error, which has no end position, still gets a visible underline', async () => {
+        const [diagnostic] = await checkNow('let x = ;')
+        assert.deepStrictEqual([diagnostic.range.start.line, diagnostic.range.start.character], [0, 8])
+        assert.ok(!diagnostic.range.isEmpty, `the underline is empty: ${JSON.stringify(rangeOf(diagnostic))}`)
+    })
+
+    test('an error deep in a real script lands on the right line and token', async () => {
+        const script = [
+            '// Code written by someone used to JavaScript.',
+            'let values = [1, 2, 3];',
+            'let total = 0;',
+            '',
+            'for v in values {',
+            '    if v === 2 {',
+            '        print(`skipping ${v}`);',
+            '        continue;',
+            '    }',
+            '    total += v;',
+            '}',
+        ].join('\n')
+        // `===` is on line 6, columns 10-12 (1-based) -> VS Code line 5, characters 9 to 12.
+        assert.deepStrictEqual((await checkNow(script)).map(rangeOf), [[5, 9, 5, 12]])
+    })
+
+    test('an invalid operator shows rhai\'s hint at the operator', async () => {
+        assert.deepStrictEqual(summarise(await checkNow('let a = 1 === 1;')), [
+            ["'===' is not a valid operator. This is not JavaScript! Should it be '=='?", 0, 10],
+        ])
+    })
+
+    test('an unexpected character is reported where it is', async () => {
+        assert.deepStrictEqual(summarise(await checkNow('let x = 1 £ 2;')), [["Unexpected '£'", 0, 10]])
+    })
+
+    test('an invalid character literal is reported', async () => {
+        assert.deepStrictEqual(summarise(await checkNow("let c = 'ab';")), [["Invalid character: 'ab'", 0, 8]])
+    })
+
+    test('every invalid token in the file is shown, not only the last one', async () => {
+        assert.deepStrictEqual(summarise(await checkNow("let a = 1 === 1;\nlet c = 'ab';")), [
+            ["'===' is not a valid operator. This is not JavaScript! Should it be '=='?", 0, 10],
+            ["Invalid character: 'ab'", 1, 8],
+        ])
+    })
+
+    test('only the first grammar error is shown', async () => {
+        // rhai's parser stops at its first error, so the second `let y = ;` is not reported yet.
+        assert.deepStrictEqual(summarise(await checkNow('let x = ;\nlet y = ;')), [["Unexpected ';'", 0, 8]])
+    })
+
+    test('a reserved symbol is reported by the parser fallback', async () => {
+        assert.deepStrictEqual(summarise(await checkNow('let x = $;')), [["'$' is a reserved symbol", 0, 8]])
+    })
+
+    test('valid interpolated strings are not reported', async () => {
+        assert.deepStrictEqual(
+            summarise(await checkNow('let x = 1;\nlet s = `a ${ #{v: x}.v } b ${ `c ${x}` } d`;')),
+            [],
+        )
     })
 
     test('the rhai.syntaxCheckRhai command checks the active file immediately', async () => {
