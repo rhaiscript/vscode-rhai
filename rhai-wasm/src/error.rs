@@ -75,7 +75,12 @@ impl From<RhaiError> for JsValue {
         let js_err = js_sys::Error::new(&err.error_message);
         js_err.set_name("RhaiError");
 
-        for (key, value) in [("line", err.line), ("column", err.column)] {
+        for (key, value) in [
+            ("line", err.line),
+            ("column", err.column),
+            ("end_line", err.end_line),
+            ("end_column", err.end_column),
+        ] {
             if let Some(n) = value {
                 let _ = js_sys::Reflect::set(&js_err, &key.into(), &n.into());
             }

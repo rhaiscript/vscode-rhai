@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import {squigglyLineError} from "./errors";
+import * as vscode from "vscode"
+import {RhaiError, squigglyLineErrors} from "./errors"
 import * as rhai from '../dist/rhai/rhai_wasm.js'
 
 export function isRhaiDocument(document: vscode.TextDocument) {
@@ -11,13 +11,13 @@ export async function compileRhaiHandler(diagnostics: vscode.DiagnosticCollectio
     if (!document) {
         return
     }
-    try {
-        rhai.compile(document.getText());
-        diagnostics.delete(document.uri);
-    } catch (error) {
-        const e = error as { name?: string; message: string; line?: number; column?: number }
-        await squigglyLineError(e,document, diagnostics, )
+    if (!isRhaiDocument(document)) {
+        await vscode.window.showWarningMessage('Rhai: open a .rhai file to check its syntax')
+        return
     }
+    const errors = rhai.compile(document.getText()) as RhaiError[]
+    diagnostics.delete(document.uri)
+    await squigglyLineErrors(errors, document, diagnostics)
 }
 
 export async function compileGrainHandler(diagnostics: vscode.DiagnosticCollection, uri?: vscode.Uri) {
@@ -34,8 +34,8 @@ export async function compileGrainHandler(diagnostics: vscode.DiagnosticCollecti
         diagnostics.delete(document.uri)
         await vscode.workspace.fs.writeFile(document.uri.with({path: document.uri.path.replace(/\.rhai$/, '.rgrn')}), bytes)
     } catch (error) {
-        const e = error as { name?: string; message: string; line?: number; column?: number }
-        await squigglyLineError(e,document, diagnostics,)
+        const e = error as RhaiError
+        await squigglyLineErrors([e], document, diagnostics,)
     }
 }
 
