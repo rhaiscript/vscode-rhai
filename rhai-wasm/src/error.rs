@@ -99,7 +99,7 @@ mod tests {
         let err = parse_error("let a = 1;\nlet = 2;");
 
         assert_eq!(err.line, Some(2));
-        assert_eq!(err.column, Some(5));
+        assert_eq!(err.column, Some(4));
     }
 
     #[test]

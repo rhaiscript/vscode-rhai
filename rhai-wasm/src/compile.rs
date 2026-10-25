@@ -66,22 +66,10 @@ mod tests {
     use rhai::Engine;
     use rhai::grain::{Program, Vm};
     use std::path::{Path, PathBuf};
-    const KNOWN_GRAIN_FAILURES: &[(&str, &str)] = &[
-        (
-            "switch.rhai",
-            "upstream bug: float switch label missing FLOAT caps (<link to your report>)",
-        ),
-        ("loop.rhai", "Grain cannot lower `export` yet"),
-        ("module.rhai", "Grain cannot lower `import` yet"),
-        (
-            "function_decl3.rhai",
-            "Grain cannot lower an expression yet",
-        ),
-        (
-            "mat_mul.rhai",
-            "exceeds rhai's debug-build expression depth limit",
-        ),
-    ];
+    const KNOWN_GRAIN_FAILURES: &[(&str, &str)] = &[(
+        "mat_mul.rhai",
+        "exceeds rhai's debug-build expression depth limit",
+    )];
     fn get_rhai_test_script() -> Vec<PathBuf> {
         let rhai_scripts_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../test");
         let mut files = vec![];
