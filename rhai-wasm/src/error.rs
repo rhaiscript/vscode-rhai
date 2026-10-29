@@ -52,6 +52,11 @@ impl RhaiError {
         Some(start_col + current_token_len + 1)
     }
 
+        pub fn set_start_position(&mut self, line: Option<usize>, column: Option<usize>) {
+        self.line = line;
+        self.column = column;
+    }
+
     pub fn set_end_position(&mut self, end_line: Option<usize>, end_column: Option<usize>) {
         self.end_line = end_line;
         self.end_column = end_column;

@@ -1,6 +1,6 @@
 use crate::error::RhaiError;
 use rhai::grain::Compiler;
-use rhai::{Engine, LexError, Position, Token};
+use rhai::{Engine, LexError, ParseErrorType, Position, Token};
 
 pub(crate) fn compile_grain_byte_code(source: &str) -> Result<Vec<u8>, RhaiError> {
     let engine = Engine::new();
@@ -18,6 +18,7 @@ pub(crate) fn compile_rhai(source: &str) -> Vec<RhaiError> {
     let (stream, tc) = engine.lex(&scripts);
     let mut interpolations: Vec<usize> = Vec::new();
     let mut errors = Vec::new();
+    let mut tokens = Vec::new();
     let mut pending_error: Option<(Box<LexError>, Position)> = None;
     for (token, pos) in stream {
         if let Some((err, prev_pos)) = pending_error.take() {
@@ -28,6 +29,8 @@ pub(crate) fn compile_rhai(source: &str) -> Vec<RhaiError> {
             }
             errors.push(rhai_err);
         }
+        tokens.push((pos, tc.borrow().last_token_end));
+
         match token {
             Token::EOF => break,
             Token::LexError(err) => {
@@ -54,7 +57,32 @@ pub(crate) fn compile_rhai(source: &str) -> Vec<RhaiError> {
     if errors.is_empty()
         && let Err(err) = engine.compile(source)
     {
-        errors.push(err.into());
+        let is_missing = matches!(
+            err.err_type(),
+            ParseErrorType::MissingToken(..)
+                | ParseErrorType::MissingSymbol(..)
+                | ParseErrorType::ExprExpected(..)
+                | ParseErrorType::FnMissingParams(..)
+                | ParseErrorType::FnMissingBody(..)
+                | ParseErrorType::UnexpectedEOF
+                | ParseErrorType::PropertyExpected
+                | ParseErrorType::VariableExpected
+                | ParseErrorType::FnMissingName
+        );
+
+        let error_pos = err.position();
+        let token = if is_missing {
+            tokens.iter().find(|(_, end)| *end == error_pos)
+        } else {
+            tokens.iter().find(|(start, _)| *start == error_pos)
+        };
+        let mut rhai_err: RhaiError = err.into();
+
+        if let Some((start, end)) = token {
+            rhai_err.set_start_position(start.line(), start.position());
+            rhai_err.set_end_position(end.line(), end.position());
+        }
+        errors.push(rhai_err);
     }
     errors.into_iter().collect()
 }
