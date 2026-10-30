@@ -1,5 +1,84 @@
-use rhai::{ParseError, Position};
+use rhai::{LexError, ParseError, ParseErrorType, Position, Token, TokenIterator, TokenizerControl};
 use wasm_bindgen::JsValue;
+
+/// Identify and lexing the tokens
+pub(crate) fn lexing_tokens_position(source: &str,tokens:&mut Vec<(Position, Position)>, errors: &mut Vec<RhaiError>,stream: TokenIterator, tc: TokenizerControl) {
+    let mut pending_error: Option<(Box<LexError>, Position)> = None;
+    let mut interpolations: Vec<usize> = Vec::new();
+
+    for (token, pos) in stream {
+        if let Some((err, prev_pos)) = pending_error.take() {
+            let mut rhai_err =
+                RhaiError::new(err.to_string(), prev_pos.line(), prev_pos.position());
+            if let Some(end_col) = RhaiError::current_token_len(source, prev_pos, pos) {
+                rhai_err.set_end_position(prev_pos.line(), Some(end_col));
+            }
+            errors.push(rhai_err);
+        }
+        tokens.push((pos, tc.borrow().last_token_end));
+
+        match token {
+            Token::EOF => break,
+            Token::LexError(err) => {
+                pending_error = Some((err, pos));
+            }
+            Token::InterpolatedString(_) => interpolations.push(0),
+            Token::LeftBrace | Token::MapStart => {
+                if let Some(depth) = interpolations.last_mut() {
+                    *depth += 1;
+                }
+            }
+            Token::RightBrace => {
+                if let Some(depth) = interpolations.last_mut() {
+                    *depth = depth.saturating_sub(1);
+                    if *depth == 0 {
+                        interpolations.pop();
+                        tc.borrow_mut().is_within_text = true;
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+/// Identify and locate the grammar error token position for squiggly line
+/// `engine.compile` only return the first grammar error.
+pub(crate) fn grammar_error(
+    tokens: &[(Position, Position)],
+    errors: &mut Vec<RhaiError>,
+    compile_error: ParseError,
+) {
+    if !errors.is_empty() {
+        return;
+    }
+    let is_missing = matches!(
+        compile_error.err_type(),
+        ParseErrorType::MissingToken(..)
+            | ParseErrorType::MissingSymbol(..)
+            | ParseErrorType::ExprExpected(..)
+            | ParseErrorType::FnMissingParams(..)
+            | ParseErrorType::FnMissingBody(..)
+            | ParseErrorType::UnexpectedEOF
+            | ParseErrorType::PropertyExpected
+            | ParseErrorType::VariableExpected
+            | ParseErrorType::FnMissingName
+    );
+
+    let error_pos = compile_error.position();
+    let token = if is_missing {
+        tokens.iter().find(|(_, end)| *end == error_pos)
+    } else {
+        tokens.iter().find(|(start, _)| *start == error_pos)
+    };
+    let mut rhai_err: RhaiError = compile_error.into();
+
+    if let Some((start, end)) = token {
+        rhai_err.set_start_position(start.line(), start.position());
+        rhai_err.set_end_position(end.line(), end.position());
+    }
+    errors.push(rhai_err);
+}
 
 #[derive(Debug)]
 pub(crate) struct RhaiError {
@@ -50,6 +129,11 @@ impl RhaiError {
         let current_token_len = current_token_text.trim_end().chars().count().max(1);
 
         Some(start_col + current_token_len + 1)
+    }
+
+    pub fn set_start_position(&mut self, line: Option<usize>, column: Option<usize>) {
+        self.line = line;
+        self.column = column;
     }
 
     pub fn set_end_position(&mut self, end_line: Option<usize>, end_column: Option<usize>) {

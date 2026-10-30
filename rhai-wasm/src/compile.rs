@@ -1,14 +1,32 @@
-use crate::error::RhaiError;
+use crate::error::{RhaiError, grammar_error, lexing_tokens_position};
+use rhai::Engine;
 use rhai::grain::Compiler;
-use rhai::{Engine, LexError, Position, Token};
 
-pub(crate) fn compile_grain_byte_code(source: &str) -> Result<Vec<u8>, RhaiError> {
+pub(crate) fn compile_grain_byte_code(source: &str) -> Result<Vec<u8>, Vec<RhaiError>> {
     let engine = Engine::new();
-    let ast = engine.compile(source)?;
+    let mut errors = Vec::new();
+    let mut tokens = Vec::new();
+    let scripts = [source];
+    let (stream, tc) = engine.lex(&scripts);
+    lexing_tokens_position(source, &mut tokens, &mut errors, stream, tc);
+    let ast = match engine.compile(source) {
+        Ok(ast) => ast,
+        Err(err) => {
+            grammar_error(&tokens, &mut errors, err);
+            return Err(errors);
+        }
+    };
     let program = Compiler::new().compile(&ast);
-    let buf = program
+    let buf_res = program
         .write()
-        .map_err(|e| RhaiError::new(format!("failed to write program: {e}"), None, None))?;
+        .map_err(|e| RhaiError::new(format!("failed to write program: {e}"), None, None));
+    let buf = match buf_res {
+        Ok(buf) => buf,
+        Err(err) => {
+            errors.push(err);
+            return Err(errors);
+        }
+    };
     Ok(buf)
 }
 
@@ -16,45 +34,11 @@ pub(crate) fn compile_rhai(source: &str) -> Vec<RhaiError> {
     let engine = Engine::new();
     let scripts = [source];
     let (stream, tc) = engine.lex(&scripts);
-    let mut interpolations: Vec<usize> = Vec::new();
     let mut errors = Vec::new();
-    let mut pending_error: Option<(Box<LexError>, Position)> = None;
-    for (token, pos) in stream {
-        if let Some((err, prev_pos)) = pending_error.take() {
-            let mut rhai_err =
-                RhaiError::new(err.to_string(), prev_pos.line(), prev_pos.position());
-            if let Some(end_col) = RhaiError::current_token_len(source, prev_pos, pos) {
-                rhai_err.set_end_position(prev_pos.line(), Some(end_col));
-            }
-            errors.push(rhai_err);
-        }
-        match token {
-            Token::EOF => break,
-            Token::LexError(err) => {
-                pending_error = Some((err, pos));
-            }
-            Token::InterpolatedString(_) => interpolations.push(0),
-            Token::LeftBrace | Token::MapStart => {
-                if let Some(depth) = interpolations.last_mut() {
-                    *depth += 1;
-                }
-            }
-            Token::RightBrace => {
-                if let Some(depth) = interpolations.last_mut() {
-                    *depth = depth.saturating_sub(1);
-                    if *depth == 0 {
-                        interpolations.pop();
-                        tc.borrow_mut().is_within_text = true;
-                    }
-                }
-            }
-            _ => {}
-        }
-    }
-    if errors.is_empty()
-        && let Err(err) = engine.compile(source)
-    {
-        errors.push(err.into());
+    let mut tokens = Vec::new();
+    lexing_tokens_position(source, &mut tokens, &mut errors, stream, tc);
+    if let Err(err) = engine.compile(source) {
+        grammar_error(&tokens, &mut errors, err)
     }
     errors.into_iter().collect()
 }
@@ -104,22 +88,21 @@ mod tests {
 
     #[test]
     fn compiles_to_a_readable_program() {
-        let bytes = compile_grain_byte_code("let x = 40; x + 2").unwrap();
-
+        let bytes = compile_grain_byte_code("let x = 40; x + 2").expect("script compiles");
         assert!(!bytes.is_empty());
         Program::read(&bytes).expect("written program reads back");
     }
 
     #[test]
     fn empty_script_compiles() {
-        let bytes = compile_grain_byte_code("").unwrap();
-
+        let bytes = compile_grain_byte_code("").expect("empty script compiles");
         Program::read(&bytes).expect("empty program reads back");
     }
 
     #[test]
     fn syntax_error_is_rejected() {
-        assert!(compile_grain_byte_code("let = ;").is_err());
+        let errs = compile_grain_byte_code("let = ;").unwrap_err();
+        assert!(!errs.is_empty());
     }
 
     /// The bytecode must mean the same as the script: run both and compare.
@@ -189,8 +172,7 @@ mod tests {
 
     /// Asserts the exact errors reported for `source`, as
     /// `(message, line, column, end column)`. Lines and columns are 1-based and the end column
-    /// is exclusive. Lexer errors sit on one line, so the end shares the start's line; parse
-    /// errors carry no end and use `None`.
+    /// is exclusive. The end shares the start's line; `None` means no end was found.
     fn assert_errors(source: &str, expected: &[(&str, usize, usize, Option<usize>)]) {
         let expected: Vec<RhaiError> = expected
             .iter()
@@ -344,7 +326,7 @@ mod tests {
 
     #[test]
     fn grammar_error_is_reported() {
-        assert_errors("let x = ;", &[("Unexpected ';'", 1, 9, None)]);
+        assert_errors("let x = ;", &[("Unexpected ';'", 1, 9, Some(10))]);
     }
 
     // --- end of the underlined range ---------------------------------------------------
