@@ -116,7 +116,11 @@ mod tests {
             "let a = 1 === 1;\nlet c = 'ab';",
         ] {
             let errs = compile_grain_byte_code(source).unwrap_err();
-            assert_eq!(format!("{errs:?}"), syntax_errors(source), "for source: {source:?}");
+            assert_eq!(
+                format!("{errs:?}"),
+                syntax_errors(source),
+                "for source: {source:?}"
+            );
         }
     }
 
@@ -365,7 +369,12 @@ mod tests {
     fn missing_closing_paren_underlines_the_last_token_inside() {
         assert_errors(
             "let x = (1 + 2;",
-            &[("Expecting ')' for a matching ( in this expression", 1, 14, Some(15))],
+            &[(
+                "Expecting ')' for a matching ( in this expression",
+                1,
+                14,
+                Some(15),
+            )],
         );
     }
 
@@ -394,7 +403,12 @@ mod tests {
     fn missing_function_name_underlines_fn() {
         assert_errors(
             "fn (x) {}",
-            &[("Expecting function name in function declaration", 1, 1, Some(3))],
+            &[(
+                "Expecting function name in function declaration",
+                1,
+                1,
+                Some(3),
+            )],
         );
     }
 
@@ -413,7 +427,12 @@ mod tests {
     fn duplicated_property_underlines_the_second_name() {
         assert_errors(
             "let x = #{a:1, a:2};",
-            &[("Duplicated property for object map literal: a", 1, 16, Some(17))],
+            &[(
+                "Duplicated property for object map literal: a",
+                1,
+                16,
+                Some(17),
+            )],
         );
     }
 
@@ -437,7 +456,12 @@ mod tests {
     fn break_outside_a_loop_underlines_break() {
         assert_errors(
             "break;",
-            &[("Break statement should only be used inside a loop", 1, 1, Some(6))],
+            &[(
+                "Break statement should only be used inside a loop",
+                1,
+                1,
+                Some(6),
+            )],
         );
     }
 
