@@ -52,6 +52,36 @@ suite('Compile Rhai to Grain', () => {
         assert.strictEqual(await h.exists(h.grainUri(document.uri)), false)
     })
 
+    test('every lexer error is reported, not only the first', async () => {
+        const {document} = await h.openRhai(file, "let a = 1 === 1;\nlet c = 'ab';")
+
+        await vscode.commands.executeCommand('rhai.compileGrain')
+        const summary = vscode.languages.getDiagnostics(document.uri)
+            .map((d) => [d.message, d.range.start.line, d.range.start.character])
+        assert.deepStrictEqual(summary, [
+            ["'===' is not a valid operator. This is not JavaScript! Should it be '=='?", 0, 10],
+            ["Invalid character: 'ab'", 1, 8],
+        ])
+        assert.strictEqual(await h.exists(h.grainUri(document.uri)), false)
+    })
+
+    test('a failed write is shown as an error message, not a diagnostic', async () => {
+        const error = h.stubErrorMessage(sandbox)
+        const {document} = await h.openRhai(file, VALID)
+        // A folder where the .rgrn should go makes `writeFile` throw a FileSystemError.
+        const output = h.grainUri(document.uri)
+        await vscode.workspace.fs.createDirectory(output)
+        try {
+            await vscode.commands.executeCommand('rhai.compileGrain')
+
+            sinon.assert.calledOnce(error)
+            assert.match(String(error.firstCall.args[0]), /^Rhai: /)
+            assert.deepStrictEqual(vscode.languages.getDiagnostics(document.uri), [])
+        } finally {
+            await vscode.workspace.fs.delete(output, {recursive: true})
+        }
+    })
+
     test('fixing the error clears the diagnostic', async () => {
         const document = await h.saveRhai(file, INVALID)
         await h.waitFor(() => vscode.languages.getDiagnostics(document.uri).length > 0, 'a Grain diagnostic')

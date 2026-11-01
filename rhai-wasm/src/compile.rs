@@ -105,6 +105,27 @@ mod tests {
         assert!(!errs.is_empty());
     }
 
+    /// Saving to Grain and the on-type syntax check must underline the same places.
+    #[test]
+    fn grain_reports_the_same_errors_as_the_syntax_check() {
+        for source in [
+            "let x = ;",
+            "let x = 1\nlet y = 2;",
+            "const c = 1; c = 2;",
+            "let s = \"abc",
+            "let a = 1 === 1;\nlet c = 'ab';",
+        ] {
+            let errs = compile_grain_byte_code(source).unwrap_err();
+            assert_eq!(format!("{errs:?}"), syntax_errors(source), "for source: {source:?}");
+        }
+    }
+
+    #[test]
+    fn grain_reports_every_lexer_error() {
+        let errs = compile_grain_byte_code("let a = 1 === 1;\nlet c = 'ab';").unwrap_err();
+        assert_eq!(errs.len(), 2, "{errs:?}");
+    }
+
     /// The bytecode must mean the same as the script: run both and compare.
     #[test]
     fn bytecode_evaluates_like_the_script() {
@@ -327,6 +348,118 @@ mod tests {
     #[test]
     fn grammar_error_is_reported() {
         assert_errors("let x = ;", &[("Unexpected ';'", 1, 9, Some(10))]);
+    }
+
+    // --- grammar error ranges: something missing underlines the token before it -------
+
+    #[test]
+    fn missing_semicolon_underlines_the_token_before_the_line_break() {
+        // rhai reports the start of line 2; the statement that lacks `;` ends at `1`.
+        assert_errors(
+            "let x = 1\nlet y = 2;",
+            &[("Expecting ';' to terminate this statement", 1, 9, Some(10))],
+        );
+    }
+
+    #[test]
+    fn missing_closing_paren_underlines_the_last_token_inside() {
+        assert_errors(
+            "let x = (1 + 2;",
+            &[("Expecting ')' for a matching ( in this expression", 1, 14, Some(15))],
+        );
+    }
+
+    #[test]
+    fn missing_variable_name_underlines_let_on_its_own_line() {
+        assert_errors(
+            "let x = 1;\nlet = 2;",
+            &[("Expecting name of a variable", 2, 1, Some(4))],
+        );
+    }
+
+    #[test]
+    fn missing_property_name_underlines_the_dot() {
+        assert_errors("x.;", &[("Expecting name of a property", 1, 2, Some(3))]);
+    }
+
+    #[test]
+    fn missing_function_params_underline_the_function_name() {
+        assert_errors(
+            "fn foo",
+            &[("Expecting parameters for function foo", 1, 4, Some(7))],
+        );
+    }
+
+    #[test]
+    fn missing_function_name_underlines_fn() {
+        assert_errors(
+            "fn (x) {}",
+            &[("Expecting function name in function declaration", 1, 1, Some(3))],
+        );
+    }
+
+    #[test]
+    #[ignore = "VariableExpected is always treated as missing, so `let` is underlined instead of `fn`"]
+    fn reserved_keyword_as_variable_name_underlines_the_keyword() {
+        assert_errors(
+            "let fn = 2;",
+            &[("Expecting name of a variable", 1, 5, Some(7))],
+        );
+    }
+
+    // --- grammar error ranges: something wrong underlines that token -------------------
+
+    #[test]
+    fn duplicated_property_underlines_the_second_name() {
+        assert_errors(
+            "let x = #{a:1, a:2};",
+            &[("Duplicated property for object map literal: a", 1, 16, Some(17))],
+        );
+    }
+
+    #[test]
+    fn duplicated_parameter_underlines_the_second_name() {
+        assert_errors(
+            "fn f(a, a) {}",
+            &[("Duplicated parameter a for function f", 1, 9, Some(10))],
+        );
+    }
+
+    #[test]
+    fn assignment_to_constant_underlines_the_constant() {
+        assert_errors(
+            "const c = 1; c = 2;",
+            &[("Cannot assign to constant c", 1, 14, Some(15))],
+        );
+    }
+
+    #[test]
+    fn break_outside_a_loop_underlines_break() {
+        assert_errors(
+            "break;",
+            &[("Break statement should only be used inside a loop", 1, 1, Some(6))],
+        );
+    }
+
+    #[test]
+    fn nested_function_definition_underlines_the_inner_fn() {
+        assert_errors(
+            "fn foo() { fn bar() {} }",
+            &[(
+                "Function definitions must be at global level and cannot be inside a block or another function",
+                1,
+                12,
+                Some(14),
+            )],
+        );
+    }
+
+    #[test]
+    fn unknown_operator_underlines_the_operator() {
+        assert_errors(
+            "let x = 1 @ 2;",
+            &[("Unknown operator: '@'", 1, 11, Some(12))],
+        );
     }
 
     // --- end of the underlined range ---------------------------------------------------
