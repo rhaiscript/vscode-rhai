@@ -34,8 +34,8 @@ export async function compileGrainHandler(diagnostics: vscode.DiagnosticCollecti
         diagnostics.delete(document.uri)
         await vscode.workspace.fs.writeFile(document.uri.with({path: document.uri.path.replace(/\.rhai$/, '.rgrn')}), bytes)
     } catch (error) {
-        const e = error as RhaiError
-        await squigglyLineErrors([e], document, diagnostics,)
+        const errors = Array.isArray(error) ? error : [error]
+        await squigglyLineErrors(errors as RhaiError[], document, diagnostics,)
     }
 }
 

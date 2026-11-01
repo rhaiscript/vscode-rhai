@@ -160,3 +160,7 @@ export function stubInformationMessage(sandbox: sinon.SinonSandbox, answer: stri
 export function stubWarningMessage(sandbox: sinon.SinonSandbox): sinon.SinonStub {
     return sandbox.stub(vscode.window, 'showWarningMessage').resolves(undefined)
 }
+
+export function stubErrorMessage(sandbox: sinon.SinonSandbox): sinon.SinonStub {
+    return sandbox.stub(vscode.window, 'showErrorMessage').resolves(undefined)
+}
