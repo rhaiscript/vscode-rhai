@@ -6,8 +6,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 pub fn compile_grain(source: &str) -> Result<Vec<u8>, js_sys::Array> {
-    compile_grain_byte_code(source)
-        .map_err(|errs| errs.into_iter().map(JsValue::from).collect())
+    compile_grain_byte_code(source).map_err(|errs| errs.into_iter().map(JsValue::from).collect())
 }
 
 #[wasm_bindgen]

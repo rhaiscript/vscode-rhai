@@ -1,8 +1,16 @@
-use rhai::{LexError, ParseError, ParseErrorType, Position, Token, TokenIterator, TokenizerControl};
+use rhai::{
+    LexError, ParseError, ParseErrorType, Position, Token, TokenIterator, TokenizerControl,
+};
 use wasm_bindgen::JsValue;
 
 /// Identify and lexing the tokens
-pub(crate) fn lexing_tokens_position(source: &str,tokens:&mut Vec<(Position, Position)>, errors: &mut Vec<RhaiError>,stream: TokenIterator, tc: TokenizerControl) {
+pub(crate) fn lexing_tokens_position(
+    source: &str,
+    tokens: &mut Vec<(Position, Position)>,
+    errors: &mut Vec<RhaiError>,
+    stream: TokenIterator,
+    tc: TokenizerControl,
+) {
     let mut pending_error: Option<(Box<LexError>, Position)> = None;
     let mut interpolations: Vec<usize> = Vec::new();
 
