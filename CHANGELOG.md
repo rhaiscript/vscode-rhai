@@ -1,3 +1,8 @@
+Version 0.7.3
+=============
+
+* Improved grammar error reporting for rhai files.
+
 Version 0.7.2
 =============
 
