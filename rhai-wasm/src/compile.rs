@@ -354,29 +354,45 @@ mod tests {
         assert_errors("let x = ;", &[("Unexpected ';'", 1, 9, Some(10))]);
     }
 
-    // --- grammar error ranges: something missing underlines the token before it -------
+    // --- grammar error ranges: a missing symbol underlines the one column where it ---
+    // --- belongs (the gap right after the previous token), not that token itself  ---
 
     #[test]
-    fn missing_semicolon_underlines_the_token_before_the_line_break() {
-        // rhai reports the start of line 2; the statement that lacks `;` ends at `1`.
+    fn missing_comma_underlines_the_space_after_the_param() {
         assert_errors(
-            "let x = 1\nlet y = 2;",
-            &[("Expecting ';' to terminate this statement", 1, 9, Some(10))],
+            "fn fib(num {\n    if num < 2 {\n        num\n    } else {\n        fib(num-1) + fib(num - 2)\n    }\n}",
+            &[(
+                "Expecting ',' to separate the parameters of function 'fib'",
+                1,
+                11,
+                Some(12),
+            )],
         );
     }
 
     #[test]
-    fn missing_closing_paren_underlines_the_last_token_inside() {
+    fn missing_semicolon_underlines_the_end_of_the_line() {
+        // The gap is past the last character of line 1; the editor clamps it to the line end.
+        assert_errors(
+            "let x = 1\nlet y = 2;",
+            &[("Expecting ';' to terminate this statement", 1, 10, Some(11))],
+        );
+    }
+
+    #[test]
+    fn missing_closing_paren_underlines_the_next_token_when_there_is_no_space() {
         assert_errors(
             "let x = (1 + 2;",
             &[(
                 "Expecting ')' for a matching ( in this expression",
                 1,
-                14,
-                Some(15),
+                15,
+                Some(16),
             )],
         );
     }
+
+    // --- grammar error ranges: an incomplete construct underlines the token before it ---
 
     #[test]
     fn missing_variable_name_underlines_let_on_its_own_line() {
