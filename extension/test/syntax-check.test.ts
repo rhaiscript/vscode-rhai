@@ -155,6 +155,13 @@ suite('Rhai syntax check while typing', () => {
         assert.ok(!diagnostic.range.isEmpty, `the underline is empty: ${JSON.stringify(rangeOf(diagnostic))}`)
     })
 
+    test('a missing symbol underlines the gap where it belongs, not the token before it', async () => {
+        const [diagnostic] = await checkNow('fn fib(num {}')
+        assert.strictEqual(diagnostic.message, "Expecting ',' to separate the parameters of function 'fib'")
+        // rhai: the space after `num`, column 11 to 12 (1-based, exclusive end) -> VS Code: character 10 to 11.
+        assert.deepStrictEqual(rangeOf(diagnostic), [0, 10, 0, 11])
+    })
+
     test('an error deep in a real script lands on the right line and token', async () => {
         const script = [
             '// Code written by someone used to JavaScript.',

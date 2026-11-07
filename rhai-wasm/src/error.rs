@@ -60,12 +60,16 @@ pub(crate) fn grammar_error(
     if !errors.is_empty() {
         return;
     }
-    let is_missing = matches!(
+    let is_insert_symbol_err = matches!(
         compile_error.err_type(),
         ParseErrorType::MissingToken(..)
             | ParseErrorType::MissingSymbol(..)
             | ParseErrorType::ExprExpected(..)
-            | ParseErrorType::FnMissingParams(..)
+    );
+
+    let is_construct_incomplete = matches!(
+        compile_error.err_type(),
+        ParseErrorType::FnMissingParams(..)
             | ParseErrorType::FnMissingBody(..)
             | ParseErrorType::UnexpectedEOF
             | ParseErrorType::PropertyExpected
@@ -74,7 +78,7 @@ pub(crate) fn grammar_error(
     );
 
     let error_pos = compile_error.position();
-    let token = if is_missing {
+    let token = if is_construct_incomplete || is_insert_symbol_err {
         tokens.iter().find(|(_, end)| *end == error_pos)
     } else {
         tokens.iter().find(|(start, _)| *start == error_pos)
@@ -82,8 +86,13 @@ pub(crate) fn grammar_error(
     let mut rhai_err: RhaiError = compile_error.into();
 
     if let Some((start, end)) = token {
-        rhai_err.set_start_position(start.line(), start.position());
-        rhai_err.set_end_position(end.line(), end.position());
+        if is_insert_symbol_err {
+            rhai_err.set_start_position(end.line(), end.position());
+            rhai_err.set_end_position(end.line(), end.position().map(|c| c + 1));
+        } else {
+            rhai_err.set_start_position(start.line(), start.position());
+            rhai_err.set_end_position(end.line(), end.position());
+        }
     }
     errors.push(rhai_err);
 }
