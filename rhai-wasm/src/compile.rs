@@ -198,22 +198,27 @@ mod tests {
     /// Asserts the exact errors reported for `source`, as
     /// `(message, line, column, end column)`. Lines and columns are 1-based and the end column
     /// is exclusive. The end shares the start's line; `None` means no end was found.
+    /// The error kind is not compared here; see `assert_kinds`.
     fn assert_errors(source: &str, expected: &[(&str, usize, usize, Option<usize>)]) {
-        let expected: Vec<RhaiError> = expected
+        let actual = compile_rhai(source);
+        let actual: Vec<_> = actual.iter().map(RhaiError::summary).collect();
+        let expected: Vec<_> = expected
             .iter()
             .map(|&(message, line, column, end_column)| {
-                let mut err = RhaiError::new(message.to_string(), Some(line), Some(column));
-                if let Some(end_column) = end_column {
-                    err.set_end_position(Some(line), Some(end_column));
-                }
-                err
+                let end_line = end_column.map(|_| line);
+                (message, Some(line), Some(column), end_line, end_column)
             })
             .collect();
-        assert_eq!(
-            syntax_errors(source),
-            format!("{expected:?}"),
-            "for source: {source:?}"
-        );
+        assert_eq!(actual, expected, "for source: {source:?}");
+    }
+
+    /// Asserts the kind of each error reported for `source`, as the string JS receives.
+    fn assert_kinds(source: &str, expected: &[&str]) {
+        let actual: Vec<_> = compile_rhai(source)
+            .iter()
+            .map(|err| err.kind().as_str())
+            .collect();
+        assert_eq!(actual, expected, "for source: {source:?}");
     }
 
     fn assert_no_errors(source: &str) {
@@ -547,6 +552,59 @@ mod tests {
         assert_errors(
             "let s = \"£bc",
             &[("Open string is not terminated", 1, 9, Some(13))],
+        );
+    }
+
+    // --- error kind: tells the extension how the range was chosen ----------------------
+
+    #[test]
+    fn a_missing_token_is_an_insert_symbol_error() {
+        for source in [
+            "fn fib(num {}",
+            "let x = 1\nlet y = 2;",
+            "let x = (1 + 2;",
+            "let x = [1, 2;",
+            "foo(1 2)",
+        ] {
+            assert_kinds(source, &["InsertSymbol"]);
+        }
+    }
+
+    #[test]
+    fn an_unfinished_construct_is_a_construct_incomplete_error() {
+        for source in ["let = 2;", "x.;", "fn foo", "fn (x) {}"] {
+            assert_kinds(source, &["ConstructIncomplete"]);
+        }
+    }
+
+    #[test]
+    fn any_other_grammar_error_is_a_standard_error() {
+        for source in ["let x = ;", "const c = 1; c = 2;", "break;"] {
+            assert_kinds(source, &["Standard"]);
+        }
+    }
+
+    #[test]
+    fn lexer_errors_are_standard_errors() {
+        assert_kinds("let a = 1 === 1;\nlet c = 'ab';", &["Standard", "Standard"]);
+    }
+
+    /// The kind decides the range: the gap for an insert, the previous token otherwise.
+    #[test]
+    fn insert_symbol_and_construct_incomplete_underline_different_places() {
+        // Both errors are reported right after a token, at column 4.
+        assert_errors(
+            "x[1",
+            &[(
+                "Expecting ']' for a matching [ in this index expression",
+                1,
+                4,
+                Some(5),
+            )],
+        );
+        assert_errors(
+            "let = 2;",
+            &[("Expecting name of a variable", 1, 1, Some(4))],
         );
     }
 }
