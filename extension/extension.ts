@@ -1,13 +1,8 @@
 import * as child_process from 'child_process'
-import {compileRhaiHandler, compileGrainHandler, isRhaiDocument} from "./handlers"
-import * as vscode from "vscode";
+import {compileGrainHandler, compileRhaiHandler, isRhaiDocument} from "./handlers"
+import * as vscode from "vscode"
 
-import
-{
-    LanguageClient,
-    LanguageClientOptions,
-    Executable,
-} from 'vscode-languageclient/node'
+import {Executable, LanguageClient, LanguageClientOptions,} from 'vscode-languageclient/node'
 
 
 let client: LanguageClient
@@ -113,13 +108,17 @@ export async function activate(context: vscode.ExtensionContext) {
     const configuration = vscode.workspace.getConfiguration('rhai')
     const useLanguageServer = configuration.get<boolean>('useLanguageServer')
     const diagnostics = vscode.languages.createDiagnosticCollection('rhai')
-    context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, uri)))
-    context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, uri)))
+    const insertCaret = vscode.window.createTextEditorDecorationType({ before: { contentText: '‸',textDecoration: 'none; font-size: 1.4em', margin: '0 -1ch 0 0', color: new vscode.ThemeColor('editorError.foreground') } })
+
+    context.subscriptions.push(insertCaret)
+
+    context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, insertCaret, uri)))
+    context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, insertCaret, uri)))
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document) => {
         const config = getRhaiConfig(document)
         const compileGrainOnSave = config.compileGrainOnSave
         if (isRhaiDocument(document) && compileGrainOnSave === 'currentFile') {
-            await compileGrainHandler(diagnostics, document.uri)
+            await compileGrainHandler(diagnostics,insertCaret, document.uri, )
             await promptFileNesting(config, document)
         }
     }))
@@ -133,7 +132,7 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             syntaxCheckRhaiTimeout = setTimeout(
                  () => {
-                     void compileRhaiHandler(diagnostics, docsChangeEvent.document.uri)
+                     void compileRhaiHandler(diagnostics, insertCaret, docsChangeEvent.document.uri)
                 }, timeoutSecs * 1000,
             )
         }

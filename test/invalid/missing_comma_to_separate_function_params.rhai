@@ -1,4 +1,4 @@
-fn fib(num {
+fn fib(num{
     if num < 2 {
         num
     } else {

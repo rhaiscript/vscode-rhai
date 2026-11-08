@@ -60,33 +60,17 @@ pub(crate) fn grammar_error(
     if !errors.is_empty() {
         return;
     }
-    let is_insert_symbol_err = matches!(
-        compile_error.err_type(),
-        ParseErrorType::MissingToken(..)
-            | ParseErrorType::MissingSymbol(..)
-            | ParseErrorType::ExprExpected(..)
-    );
-
-    let is_construct_incomplete = matches!(
-        compile_error.err_type(),
-        ParseErrorType::FnMissingParams(..)
-            | ParseErrorType::FnMissingBody(..)
-            | ParseErrorType::UnexpectedEOF
-            | ParseErrorType::PropertyExpected
-            | ParseErrorType::VariableExpected
-            | ParseErrorType::FnMissingName
-    );
-
     let error_pos = compile_error.position();
-    let token = if is_construct_incomplete || is_insert_symbol_err {
-        tokens.iter().find(|(_, end)| *end == error_pos)
-    } else {
-        tokens.iter().find(|(start, _)| *start == error_pos)
-    };
     let mut rhai_err: RhaiError = compile_error.into();
+    let token = match rhai_err.kind {
+        Kind::Standard => tokens.iter().find(|(start, _)| *start == error_pos),
+        Kind::InsertSymbol | Kind::ConstructIncomplete => {
+            tokens.iter().find(|(_, end)| *end == error_pos)
+        }
+    };
 
     if let Some((start, end)) = token {
-        if is_insert_symbol_err {
+        if rhai_err.kind == Kind::InsertSymbol {
             rhai_err.set_start_position(end.line(), end.position());
             rhai_err.set_end_position(end.line(), end.position().map(|c| c + 1));
         } else {
@@ -97,6 +81,24 @@ pub(crate) fn grammar_error(
     errors.push(rhai_err);
 }
 
+#[derive(Debug, Eq, PartialEq)]
+pub(crate) enum Kind {
+    Standard,
+    InsertSymbol,
+    ConstructIncomplete,
+}
+
+impl Kind {
+    /// The value JS receives in the error's `kind` property.
+    pub(crate) fn as_str(&self) -> &'static str {
+        match self {
+            Kind::Standard => "Standard",
+            Kind::InsertSymbol => "InsertSymbol",
+            Kind::ConstructIncomplete => "ConstructIncomplete",
+        }
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct RhaiError {
     error_message: String,
@@ -104,6 +106,7 @@ pub(crate) struct RhaiError {
     column: Option<usize>,
     end_line: Option<usize>,
     end_column: Option<usize>,
+    kind: Kind,
 }
 
 impl RhaiError {
@@ -114,6 +117,7 @@ impl RhaiError {
             column,
             end_line: None,
             end_column: None,
+            kind: Kind::Standard,
         }
     }
 
@@ -161,12 +165,25 @@ impl RhaiError {
 
 impl From<ParseError> for RhaiError {
     fn from(err: ParseError) -> Self {
+        let err_kind = match err.err_type() {
+            ParseErrorType::FnMissingParams(..)
+            | ParseErrorType::FnMissingBody(..)
+            | ParseErrorType::UnexpectedEOF
+            | ParseErrorType::PropertyExpected
+            | ParseErrorType::VariableExpected
+            | ParseErrorType::FnMissingName => Kind::ConstructIncomplete,
+            ParseErrorType::MissingToken(..)
+            | ParseErrorType::MissingSymbol(..)
+            | ParseErrorType::ExprExpected(..) => Kind::InsertSymbol,
+            _ => Kind::Standard,
+        };
         RhaiError {
             error_message: err.err_type().to_string(),
             line: err.position().line(),
             column: err.position().position(),
             end_line: None,
             end_column: None,
+            kind: err_kind,
         }
     }
 }
@@ -186,16 +203,39 @@ impl From<RhaiError> for JsValue {
                 let _ = js_sys::Reflect::set(&js_err, &key.into(), &n.into());
             }
         }
-
+        let _ = js_sys::Reflect::set(&js_err, &"kind".into(), &err.kind.as_str().into());
         js_err.into()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::RhaiError;
+    use super::{Kind, RhaiError};
     use rhai::Engine;
 
+    impl RhaiError {
+        pub(crate) fn summary(
+            &self,
+        ) -> (
+            &str,
+            Option<usize>,
+            Option<usize>,
+            Option<usize>,
+            Option<usize>,
+        ) {
+            (
+                &self.error_message,
+                self.line,
+                self.column,
+                self.end_line,
+                self.end_column,
+            )
+        }
+
+        pub(crate) fn kind(&self) -> &Kind {
+            &self.kind
+        }
+    }
     fn parse_error(source: &str) -> RhaiError {
         Engine::new().compile(source).unwrap_err().into()
     }
