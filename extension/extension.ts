@@ -7,7 +7,7 @@ import {Executable, LanguageClient, LanguageClientOptions,} from 'vscode-languag
 
 let client: LanguageClient
 let askedNestingThisSession: boolean = false
-let syntaxCheckRhaiTimeout: NodeJS.Timeout | undefined = undefined;
+let syntaxCheckRhaiTimeout: NodeJS.Timeout | undefined = undefined
 
 type CompileGrainOnSave = 'off' | 'currentFile';
 type SyntaxCheckRhaiOnChange = 'off' | 'currentFile';
@@ -104,35 +104,49 @@ async function tryToInstallLanguageServer(configuration: vscode.WorkspaceConfigu
     }
 }
 
+
 export async function activate(context: vscode.ExtensionContext) {
     const configuration = vscode.workspace.getConfiguration('rhai')
     const useLanguageServer = configuration.get<boolean>('useLanguageServer')
     const diagnostics = vscode.languages.createDiagnosticCollection('rhai')
-    const insertCaret = vscode.window.createTextEditorDecorationType({ before: { contentText: '‸',textDecoration: 'none; font-size: 1.4em', margin: '0 -1ch 0 0', color: new vscode.ThemeColor('editorError.foreground') } })
-
+    const insertCaret = vscode.window.createTextEditorDecorationType({
+        before: {
+            contentText: '‸',
+            textDecoration: 'none; font-size: 1.4em',
+            margin: '0 -1ch 0 0',
+            color: new vscode.ThemeColor('editorError.foreground')
+        }
+    })
+    const carets = {type: insertCaret, byUri: new Map<string, vscode.Range[]>()}
     context.subscriptions.push(insertCaret)
-
-    context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, insertCaret, uri)))
-    context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, insertCaret, uri)))
+    context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, carets, uri)))
+    context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, carets, uri)))
+    context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(() => {
+        const editors = vscode.window.visibleTextEditors
+        for (const editor of editors) {
+            const ranges = carets.byUri.get(editor.document.uri.toString())
+            if (ranges) editor.setDecorations(carets.type, ranges)
+        }
+    }))
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(async (document) => {
         const config = getRhaiConfig(document)
         const compileGrainOnSave = config.compileGrainOnSave
         if (isRhaiDocument(document) && compileGrainOnSave === 'currentFile') {
-            await compileGrainHandler(diagnostics,insertCaret, document.uri, )
+            await compileGrainHandler(diagnostics, carets, document.uri,)
             await promptFileNesting(config, document)
         }
     }))
-    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument( (docsChangeEvent: vscode.TextDocumentChangeEvent) => {
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument((docsChangeEvent: vscode.TextDocumentChangeEvent) => {
         const config = getRhaiConfig(docsChangeEvent.document)
-        const timeoutSecs = config.syntaxCheckRhaiDelaySeconds;
+        const timeoutSecs = config.syntaxCheckRhaiDelaySeconds
         const syntaxCheckRhaiOnChange = config.syntaxCheckRhaiOnChange
         if (isRhaiDocument(docsChangeEvent.document) && syntaxCheckRhaiOnChange === 'currentFile') {
             if (syntaxCheckRhaiTimeout) {
                 clearTimeout(syntaxCheckRhaiTimeout)
             }
             syntaxCheckRhaiTimeout = setTimeout(
-                 () => {
-                     void compileRhaiHandler(diagnostics, insertCaret, docsChangeEvent.document.uri)
+                () => {
+                    void compileRhaiHandler(diagnostics, carets, docsChangeEvent.document.uri)
                 }, timeoutSecs * 1000,
             )
         }
@@ -151,18 +165,17 @@ async function promptFileNesting(configuration: RhaiConfig, document: vscode.Tex
         const result = await vscode.window.showInformationMessage('Rhai: Would you like to enable file nesting so compiled `.rgrn` files nest under their `.rhai` source?', 'Enable', 'Not this time', 'Do not ask again')
         if (result === 'Enable') {
             if (vscode.workspace.workspaceFolders?.length) {
-                await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true,vscode.ConfigurationTarget.Workspace)
+                await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true, vscode.ConfigurationTarget.Workspace)
             } else {
                 await vscode.workspace.getConfiguration('explorer.fileNesting', document.uri).update('enabled', true, vscode.ConfigurationTarget.Global)
             }
         } else if (result === 'Do not ask again') {
             await vscode.workspace.getConfiguration('rhai').update('promptFileNesting', false, vscode.ConfigurationTarget.Global)
-        }else {
+        } else {
             askedNestingThisSession = true
         }
     }
 }
-
 
 
 export function deactivate(): Thenable<void> | undefined {
