@@ -1,3 +1,8 @@
+Version 0.7.4
+=============
+
+* Added insert carets for inserting missing symbols errors.
+
 Version 0.7.3
 =============
 

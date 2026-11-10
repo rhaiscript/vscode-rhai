@@ -1,6 +1,6 @@
 {
   "name": "Rhai",
-  "version": "v0.7.3",
+  "version": "v0.7.4",
   "fileTypes": [
     "rhai"
   ],
