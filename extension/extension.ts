@@ -1,8 +1,8 @@
 import * as child_process from 'child_process'
-import {compileGrainHandler, compileRhaiHandler, isRhaiDocument} from "./handlers"
+import { compileGrainHandler, compileRhaiHandler, isRhaiDocument } from "./handlers"
 import * as vscode from "vscode"
 
-import {Executable, LanguageClient, LanguageClientOptions,} from 'vscode-languageclient/node'
+import { Executable, LanguageClient, LanguageClientOptions, } from 'vscode-languageclient/node'
 
 
 let client: LanguageClient
@@ -37,7 +37,7 @@ async function start_client() {
     }
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{scheme: 'file', language: 'rhai'}],
+        documentSelector: [{ scheme: 'file', language: 'rhai' }],
     }
 
     client = new LanguageClient(
@@ -66,7 +66,7 @@ async function installServerBinary(): Promise<boolean> {
     // cargo install
     // download from github
     const task = new vscode.Task(
-        {type: 'cargo', task: 'install'},
+        { type: 'cargo', task: 'install' },
         vscode.workspace.workspaceFolders![0],
         'Installing lsp server',
         'rhai-lsp',
@@ -112,12 +112,12 @@ export async function activate(context: vscode.ExtensionContext) {
     const insertCaret = vscode.window.createTextEditorDecorationType({
         before: {
             contentText: '‸',
-            textDecoration: 'none; font-size: 1.4em',
-            margin: '0 -1ch 0 0',
-            color: new vscode.ThemeColor('editorError.foreground')
+            width: '0',
+            textDecoration: 'none; font-size: 1.4em; position: relative; top: 0.3em;',
+            color: new vscode.ThemeColor('editorError.foreground'),
         }
     })
-    const carets = {type: insertCaret, byUri: new Map<string, vscode.Range[]>()}
+    const carets = { type: insertCaret, byUri: new Map<string, vscode.Range[]>() }
     context.subscriptions.push(insertCaret)
     context.subscriptions.push(vscode.commands.registerCommand('rhai.compileGrain', (uri?: vscode.Uri) => compileGrainHandler(diagnostics, carets, uri)))
     context.subscriptions.push(vscode.commands.registerCommand('rhai.syntaxCheckRhai', (uri?: vscode.Uri) => compileRhaiHandler(diagnostics, carets, uri)))
