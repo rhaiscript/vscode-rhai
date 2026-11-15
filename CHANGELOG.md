@@ -1,3 +1,8 @@
+Version 0.7.5
+=============
+
+* Fixed insert carets margin issue for inserting missing symbols errors.
+
 Version 0.7.4
 =============
 
